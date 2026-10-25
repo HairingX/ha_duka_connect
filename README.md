@@ -33,13 +33,18 @@ A value the unit says it does not have gets no entity.
 2. Restart Home Assistant.
 3. Settings > Devices & services > Add integration > **Duka Connect**.
 
-Leave the host empty, and the integration searches the network for the unit: one unit found is
-set up, and of several you pick one. Or enter the unit's IP address, best a fixed one set in your
-router. The device id is in Duka's app; leave it empty, and the integration asks the unit for it.
-The search reaches units on the same network as Home Assistant; in Docker, that needs host
-networking. The password is `1111`
-unless it was changed in the app. A unit does not answer a wrong password, so a wrong one shows
-as "did not answer".
+Choose how to find the unit:
+
+- **Search the network**: the integration asks every unit on the network, by broadcast. Pick the
+  unit from those found, name it, and give its password. When none is found, search again or
+  enter the unit by hand. The search reaches units on the same network as Home Assistant: in
+  Docker, that needs host networking, and across VLANs it is not forwarded.
+- **Enter the unit by hand**: its IP address, best a fixed one set in your router, and its
+  password. The device id is in Duka's app; leave it empty, and the integration asks the unit
+  for it.
+
+The password is `1111` unless it was changed in the app. A unit does not answer a wrong password,
+so a wrong one shows as "did not answer".
 
 The address and password can be changed later: the integration's three dots > Reconfigure.
 
