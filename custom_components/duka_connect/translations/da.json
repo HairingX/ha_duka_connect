@@ -1,0 +1,158 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "description": "Device id og adgangskode står i Duka-appen. Lad device id være tomt for at spørge enheden selv.",
+        "data": {
+          "name": "Navn",
+          "host": "Vært",
+          "device_id": "Device id",
+          "password": "Adgangskode"
+        },
+        "data_description": {
+          "name": "Hvad enheden og dens entiteter hedder.",
+          "host": "Enhedens IP-adresse på dit netværk.",
+          "device_id": "De 16 tegn Duka-appen viser for enheden.",
+          "password": "1111, medmindre den er ændret i Duka-appen."
+        }
+      },
+      "reconfigure": {
+        "description": "Skift hvor enheden nås, eller dens adgangskode.",
+        "data": {
+          "host": "Vært",
+          "device_id": "Device id",
+          "password": "Adgangskode"
+        },
+        "data_description": {
+          "host": "Enhedens IP-adresse på dit netværk.",
+          "device_id": "De 16 tegn Duka-appen viser for enheden.",
+          "password": "1111, medmindre den er ændret i Duka-appen."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Enheden svarede ikke. Tjek adresse, device id og adgangskode: en enhed svarer ikke på en forkert adgangskode.",
+      "unsupported_device": "Enheden svarede, men ikke som en Duka One.",
+      "device_id_not_found": "Ingen enhed svarede med sit device id på denne adresse. Indtast device id fra Duka-appen.",
+      "unknown": "Uventet fejl."
+    },
+    "abort": {
+      "already_configured": "Denne enhed er allerede sat op.",
+      "reconfigure_successful": "Enhedens indstillinger er ændret.",
+      "wrong_device": "Enheden på denne adresse har et andet device id end den, der er sat op."
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "filter_replace": {
+        "name": "Filterskift"
+      },
+      "boost": {
+        "name": "Boost"
+      }
+    },
+    "button": {
+      "reset_filter_timer": {
+        "name": "Nulstil filtertimer"
+      },
+      "reset_alarms": {
+        "name": "Nulstil alarmer"
+      }
+    },
+    "fan": {
+      "fan": {
+        "state_attributes": {
+          "preset_mode": {
+            "state": {
+              "low": "Lav",
+              "medium": "Mellem",
+              "high": "Høj"
+            }
+          }
+        }
+      }
+    },
+    "number": {
+      "humidity_threshold": {
+        "name": "Fugtgrænse"
+      },
+      "boost_off_delay": {
+        "name": "Boost-efterløb"
+      }
+    },
+    "select": {
+      "ventilation_mode": {
+        "name": "Ventilationstilstand",
+        "state": {
+          "ventilation": "Udsugning",
+          "heat_recovery": "Varmegenvinding",
+          "supply": "Indblæsning"
+        }
+      },
+      "timer_mode": {
+        "name": "Timertilstand",
+        "state": {
+          "off": "Fra",
+          "night": "Nat",
+          "party": "Fest"
+        }
+      }
+    },
+    "sensor": {
+      "humidity": {
+        "name": "Luftfugtighed"
+      },
+      "fan_rpm": {
+        "name": "Ventilatorhastighed"
+      },
+      "rtc_battery_voltage": {
+        "name": "Urbatteri"
+      },
+      "filter_timer": {
+        "name": "Tid til filterskift"
+      },
+      "timer_countdown": {
+        "name": "Tid tilbage på timer"
+      },
+      "operating_time": {
+        "name": "Driftstid"
+      },
+      "alarm": {
+        "name": "Alarm",
+        "state": {
+          "none": "Ingen",
+          "alarm": "Alarm",
+          "warning": "Advarsel"
+        }
+      },
+      "firmware_version": {
+        "name": "Firmwareversion"
+      },
+      "firmware_date": {
+        "name": "Firmwaredato"
+      },
+      "unit_type": {
+        "name": "Enhedstype"
+      }
+    },
+    "switch": {
+      "humidity_sensor_enabled": {
+        "name": "Fugtstyret boost"
+      }
+    }
+  },
+  "exceptions": {
+    "cannot_connect": {
+      "message": "{name} svarede ikke."
+    },
+    "unsupported_device": {
+      "message": "{name} er ikke en Duka One."
+    },
+    "write_refused": {
+      "message": "Enheden tog ikke imod værdien."
+    },
+    "no_answer": {
+      "message": "Enheden svarede ikke."
+    }
+  }
+}

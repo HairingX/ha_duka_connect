@@ -1,0 +1,67 @@
+{
+  "entity": {
+    "binary_sensor": {
+      "filter_replace": {
+        "default": "mdi:air-filter"
+      },
+      "boost": {
+        "default": "mdi:fan-plus"
+      }
+    },
+    "button": {
+      "reset_filter_timer": {
+        "default": "mdi:air-filter"
+      },
+      "reset_alarms": {
+        "default": "mdi:alarm-light-off"
+      }
+    },
+    "number": {
+      "boost_off_delay": {
+        "default": "mdi:timer-outline"
+      }
+    },
+    "select": {
+      "ventilation_mode": {
+        "default": "mdi:swap-horizontal"
+      },
+      "timer_mode": {
+        "default": "mdi:timer-cog-outline"
+      }
+    },
+    "sensor": {
+      "fan_rpm": {
+        "default": "mdi:fan"
+      },
+      "rtc_battery_voltage": {
+        "default": "mdi:battery"
+      },
+      "filter_timer": {
+        "default": "mdi:air-filter"
+      },
+      "alarm": {
+        "default": "mdi:alarm-light"
+      },
+      "firmware_version": {
+        "default": "mdi:chip"
+      },
+      "firmware_date": {
+        "default": "mdi:chip"
+      },
+      "unit_type": {
+        "default": "mdi:information-outline"
+      },
+      "operating_time": {
+        "default": "mdi:timer-sand"
+      },
+      "timer_countdown": {
+        "default": "mdi:timer-sand"
+      }
+    },
+    "switch": {
+      "humidity_sensor_enabled": {
+        "default": "mdi:water-percent"
+      }
+    }
+  }
+}

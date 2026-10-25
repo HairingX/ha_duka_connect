@@ -1,0 +1,158 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "description": "The device id and password are in Duka's app. Leave the device id empty to ask the unit for it.",
+        "data": {
+          "name": "Name",
+          "host": "Host",
+          "device_id": "Device id",
+          "password": "Password"
+        },
+        "data_description": {
+          "name": "What the unit and its entities are called.",
+          "host": "The unit's IP address on your network.",
+          "device_id": "The 16 characters Duka's app shows for the unit.",
+          "password": "1111 unless it was changed in Duka's app."
+        }
+      },
+      "reconfigure": {
+        "description": "Change where the unit is reached, or its password.",
+        "data": {
+          "host": "Host",
+          "device_id": "Device id",
+          "password": "Password"
+        },
+        "data_description": {
+          "host": "The unit's IP address on your network.",
+          "device_id": "The 16 characters Duka's app shows for the unit.",
+          "password": "1111 unless it was changed in Duka's app."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "The unit did not answer. Check its address, device id and password: a unit does not answer a wrong password.",
+      "unsupported_device": "The unit answered, but not as a Duka One does.",
+      "device_id_not_found": "No unit answered at this address with its device id. Enter the device id from Duka's app.",
+      "unknown": "Unexpected error."
+    },
+    "abort": {
+      "already_configured": "This unit is already set up.",
+      "reconfigure_successful": "The unit's settings were changed.",
+      "wrong_device": "The unit at this address has another device id than the one set up."
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "filter_replace": {
+        "name": "Filter replacement"
+      },
+      "boost": {
+        "name": "Boost"
+      }
+    },
+    "button": {
+      "reset_filter_timer": {
+        "name": "Reset filter timer"
+      },
+      "reset_alarms": {
+        "name": "Reset alarms"
+      }
+    },
+    "fan": {
+      "fan": {
+        "state_attributes": {
+          "preset_mode": {
+            "state": {
+              "low": "Low",
+              "medium": "Medium",
+              "high": "High"
+            }
+          }
+        }
+      }
+    },
+    "number": {
+      "humidity_threshold": {
+        "name": "Humidity threshold"
+      },
+      "boost_off_delay": {
+        "name": "Boost off delay"
+      }
+    },
+    "select": {
+      "ventilation_mode": {
+        "name": "Ventilation mode",
+        "state": {
+          "ventilation": "Extract",
+          "heat_recovery": "Heat recovery",
+          "supply": "Supply"
+        }
+      },
+      "timer_mode": {
+        "name": "Timer mode",
+        "state": {
+          "off": "Off",
+          "night": "Night",
+          "party": "Party"
+        }
+      }
+    },
+    "sensor": {
+      "humidity": {
+        "name": "Humidity"
+      },
+      "fan_rpm": {
+        "name": "Fan speed"
+      },
+      "rtc_battery_voltage": {
+        "name": "Clock battery"
+      },
+      "filter_timer": {
+        "name": "Filter time left"
+      },
+      "timer_countdown": {
+        "name": "Timer left"
+      },
+      "operating_time": {
+        "name": "Operating time"
+      },
+      "alarm": {
+        "name": "Alarm",
+        "state": {
+          "none": "None",
+          "alarm": "Alarm",
+          "warning": "Warning"
+        }
+      },
+      "firmware_version": {
+        "name": "Firmware version"
+      },
+      "firmware_date": {
+        "name": "Firmware date"
+      },
+      "unit_type": {
+        "name": "Unit type"
+      }
+    },
+    "switch": {
+      "humidity_sensor_enabled": {
+        "name": "Humidity boost"
+      }
+    }
+  },
+  "exceptions": {
+    "cannot_connect": {
+      "message": "{name} did not answer."
+    },
+    "unsupported_device": {
+      "message": "{name} is not a Duka One."
+    },
+    "write_refused": {
+      "message": "The unit did not take the value."
+    },
+    "no_answer": {
+      "message": "The unit did not answer."
+    }
+  }
+}
