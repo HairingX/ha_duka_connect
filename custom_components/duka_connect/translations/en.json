@@ -2,7 +2,34 @@
   "config": {
     "step": {
       "user": {
-        "description": "Leave the host empty to search the network for the unit. The password is in Duka's app.",
+        "description": "How should the unit be found?",
+        "menu_options": {
+          "search": "Search the network",
+          "manual": "Enter the unit by hand"
+        }
+      },
+      "not_found": {
+        "description": "No unit that is not set up already answered the search. The search reaches units on the same network as Home Assistant.",
+        "menu_options": {
+          "search": "Search again",
+          "manual": "Enter the unit by hand"
+        }
+      },
+      "pick": {
+        "description": "Choose the unit, and give it a name. The password is in Duka's app.",
+        "data": {
+          "device_id": "Unit",
+          "name": "Name",
+          "password": "Password"
+        },
+        "data_description": {
+          "device_id": "The unit's device id, and its IP address.",
+          "name": "What the unit and its entities are called.",
+          "password": "1111 unless it was changed in Duka's app."
+        }
+      },
+      "manual": {
+        "description": "The device id and password are in Duka's app. Leave the device id empty to ask the unit for it.",
         "data": {
           "name": "Name",
           "host": "Host",
@@ -11,7 +38,7 @@
         },
         "data_description": {
           "name": "What the unit and its entities are called.",
-          "host": "The unit's IP address on your network; leave it empty to search the network.",
+          "host": "The unit's IP address on your network.",
           "device_id": "The 16 characters Duka's app shows for the unit; leave it empty to ask the unit.",
           "password": "1111 unless it was changed in Duka's app."
         }
@@ -28,23 +55,13 @@
           "device_id": "The 16 characters Duka's app shows for the unit.",
           "password": "1111 unless it was changed in Duka's app."
         }
-      },
-      "pick": {
-        "description": "Several units answered. Choose the one to set up.",
-        "data": {
-          "device_id": "Unit"
-        },
-        "data_description": {
-          "device_id": "The unit's device id, and its IP address."
-        }
       }
     },
     "error": {
       "cannot_connect": "The unit did not answer. Check its address, device id and password: a unit does not answer a wrong password.",
       "unsupported_device": "The unit answered, but not as a Duka One does.",
       "device_id_not_found": "No unit answered at this address with its device id. Enter the device id from Duka's app.",
-      "unknown": "Unexpected error.",
-      "no_units_found": "No unit that is not set up already answered the search. Enter the unit's IP address."
+      "unknown": "Unexpected error."
     },
     "abort": {
       "already_configured": "This unit is already set up.",
