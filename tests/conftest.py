@@ -75,29 +75,44 @@ def clock() -> FakeClock:
     return FakeClock()
 
 
+@pytest.fixture
+def network(unit: SimulatedDuka) -> list[SimulatedDuka]:
+    """The simulated units on the network, each on a port of its own; add one to add a unit."""
+    return [unit]
+
+
 @pytest.fixture(autouse=True)
 def simulated_network(
-    monkeypatch: pytest.MonkeyPatch, unit: SimulatedDuka, clock: FakeClock
+    monkeypatch: pytest.MonkeyPatch,
+    unit: SimulatedDuka,
+    network: list[SimulatedDuka],
+    clock: FakeClock,
 ) -> list[Client]:
-    """The network the integration sees holds only the simulated unit, on its own port.
+    """The network the integration sees holds only the simulated units.
 
-    Returns the clients made, in order.
+    A broadcast reaches every unit, and discovery sent to an address the first; a client
+    reaches the unit with its device id. Returns the clients made, in order.
     """
     made: list[Client] = []
     monkeypatch.setattr(const, "DISCOVERY_TIMEOUT", 0.3)
 
-    async def discover_unit(
+    async def discover_units(
         target: str = "255.255.255.255", *, port: int = 0, timeout: float = 2.0
     ) -> list[DiscoveredDevice]:
-        return await discover(target, port=unit.port, timeout=timeout)
+        reached = network if target == "255.255.255.255" else network[:1]
+        found: list[DiscoveredDevice] = []
+        for simulated in reached:
+            found += await discover(HOST, port=simulated.port, timeout=timeout)
+        return found
 
     def client(host: str, device_id: str, password: str) -> Client:
+        port = next((s.port for s in network if s.device_id == device_id), unit.port)
         made.append(
-            Client(host, device_id, password, port=unit.port, timeout=0.2, attempts=1, clock=clock)
+            Client(host, device_id, password, port=port, timeout=0.2, attempts=1, clock=clock)
         )
         return made[-1]
 
-    monkeypatch.setattr("custom_components.duka_connect.config_flow.discover", discover_unit)
+    monkeypatch.setattr("custom_components.duka_connect.config_flow.discover", discover_units)
     monkeypatch.setattr("custom_components.duka_connect.data.Client", client)
     return made
 

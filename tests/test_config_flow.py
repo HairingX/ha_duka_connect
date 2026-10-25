@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import pytest
 from duka_connect.testing import SimulatedDuka
+from collections.abc import AsyncIterator
 from typing import Any
 
 from homeassistant.config_entries import SOURCE_USER, ConfigFlowResult
@@ -128,3 +129,72 @@ async def test_reconfiguring_to_a_unit_that_does_not_answer_shows_an_error(
         hass, flow["flow_id"], {CONF_HOST: HOST, CONF_DEVICE_ID: DEVICE_ID, CONF_PASSWORD: PASSWORD}
     )
     assert result["errors"] == {"base": "cannot_connect"}
+
+
+SECOND_ID = "DUKA0000TEST0002"
+
+
+@pytest.fixture
+async def second_unit(network: list[SimulatedDuka]) -> AsyncIterator[SimulatedDuka]:
+    """A second unit on the network, with the same password."""
+    simulated = SimulatedDuka(device_id=SECOND_ID, password=PASSWORD)
+    await simulated.start(HOST)
+    network.append(simulated)
+    yield simulated
+    simulated.close()
+
+
+async def test_an_empty_host_sets_up_the_one_unit_the_search_finds(hass: HomeAssistant) -> None:
+    result = await start(hass, {CONF_NAME: NAME, CONF_HOST: "", CONF_DEVICE_ID: "", CONF_PASSWORD: PASSWORD})
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["data"] == entry_data()
+
+
+async def test_of_several_units_found_the_user_picks_one(
+    hass: HomeAssistant, second_unit: SimulatedDuka
+) -> None:
+    result = await start(hass, {CONF_NAME: NAME, CONF_HOST: "", CONF_DEVICE_ID: "", CONF_PASSWORD: PASSWORD})
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "pick"
+    result = await configure(hass, result["flow_id"], {CONF_DEVICE_ID: SECOND_ID})
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["data"] == entry_data(device_id=SECOND_ID)
+
+
+async def test_a_device_id_with_an_empty_host_sets_up_that_unit(
+    hass: HomeAssistant, second_unit: SimulatedDuka
+) -> None:
+    result = await start(
+        hass, {CONF_NAME: NAME, CONF_HOST: "", CONF_DEVICE_ID: SECOND_ID.lower(), CONF_PASSWORD: PASSWORD}
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["data"] == entry_data(device_id=SECOND_ID)
+
+
+async def test_a_unit_set_up_already_is_left_out_of_the_search(
+    hass: HomeAssistant, second_unit: SimulatedDuka
+) -> None:
+    MockConfigEntry(domain=DOMAIN, unique_id=DEVICE_ID, data=entry_data()).add_to_hass(hass)
+    result = await start(hass, {CONF_NAME: NAME, CONF_HOST: "", CONF_DEVICE_ID: "", CONF_PASSWORD: PASSWORD})
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["data"] == entry_data(device_id=SECOND_ID)
+
+
+async def test_a_search_that_finds_nothing_asks_for_the_host(
+    hass: HomeAssistant, unit: SimulatedDuka
+) -> None:
+    unit.answering = False
+    result = await start(hass, {CONF_NAME: NAME, CONF_HOST: "", CONF_DEVICE_ID: "", CONF_PASSWORD: PASSWORD})
+    assert result["errors"] == {"base": "no_units_found"}
+
+
+async def test_a_found_unit_with_a_wrong_password_is_shown_with_its_host(
+    hass: HomeAssistant,
+) -> None:
+    result = await start(hass, {CONF_NAME: NAME, CONF_HOST: "", CONF_DEVICE_ID: "", CONF_PASSWORD: "9999"})
+    assert result["step_id"] == "user"
+    assert result["errors"] == {"base": "cannot_connect"}
+    result = await configure(
+        hass, result["flow_id"], {CONF_NAME: NAME, CONF_HOST: HOST, CONF_DEVICE_ID: DEVICE_ID, CONF_PASSWORD: PASSWORD}
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
