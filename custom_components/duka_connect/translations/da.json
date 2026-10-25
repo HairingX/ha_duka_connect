@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "description": "Device id og adgangskode står i Duka-appen. Lad device id være tomt for at spørge enheden selv.",
+        "description": "Lad værten stå tom for at søge efter enheden på netværket. Adgangskoden står i Duka-appen.",
         "data": {
           "name": "Navn",
           "host": "Vært",
@@ -11,8 +11,8 @@
         },
         "data_description": {
           "name": "Hvad enheden og dens entiteter hedder.",
-          "host": "Enhedens IP-adresse på dit netværk.",
-          "device_id": "De 16 tegn Duka-appen viser for enheden.",
+          "host": "Enhedens IP-adresse på dit netværk; lad den stå tom for at søge på netværket.",
+          "device_id": "De 16 tegn Duka-appen viser for enheden; lad det stå tomt for at spørge enheden.",
           "password": "1111, medmindre den er ændret i Duka-appen."
         }
       },
@@ -28,13 +28,23 @@
           "device_id": "De 16 tegn Duka-appen viser for enheden.",
           "password": "1111, medmindre den er ændret i Duka-appen."
         }
+      },
+      "pick": {
+        "description": "Flere enheder svarede. Vælg den, der skal sættes op.",
+        "data": {
+          "device_id": "Enhed"
+        },
+        "data_description": {
+          "device_id": "Enhedens device id og IP-adresse."
+        }
       }
     },
     "error": {
       "cannot_connect": "Enheden svarede ikke. Tjek adresse, device id og adgangskode: en enhed svarer ikke på en forkert adgangskode.",
       "unsupported_device": "Enheden svarede, men ikke som en Duka One.",
       "device_id_not_found": "Ingen enhed svarede med sit device id på denne adresse. Indtast device id fra Duka-appen.",
-      "unknown": "Uventet fejl."
+      "unknown": "Uventet fejl.",
+      "no_units_found": "Ingen enhed, der ikke allerede er sat op, svarede på søgningen. Indtast enhedens IP-adresse."
     },
     "abort": {
       "already_configured": "Denne enhed er allerede sat op.",
