@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime
 from enum import IntEnum
 from typing import Any
 
@@ -22,9 +23,11 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from homeassistant.util import dt as dt_util
 
+from .const import CLOCK_KEY, CLOCK_OFFSET_KEY
 from .data import DukaConfigEntry, DukaData
-from .entity import DukaEntityDescription, DukaPointEntity, describe
+from .entity import DukaEntity, DukaEntityDescription, DukaPointEntity, describe, shown
 
 PARALLEL_UPDATES = 0
 
@@ -122,9 +125,12 @@ async def async_setup_entry(
     entry: DukaConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
-    """Add a sensor for every described point the unit has."""
+    """Add a sensor for every described point the unit has, and its clock where it has one."""
     data = entry.runtime_data
-    async_add_entities(DukaSensor(data, d) for d in describe(data, SENSORS))
+    entities: list[SensorEntity] = [DukaSensor(data, d) for d in describe(data, SENSORS)]
+    if shown(data, PointKey.CLOCK_TIME) and shown(data, PointKey.CLOCK_DATE):
+        entities += [DukaClock(data), DukaClockOffset(data)]
+    async_add_entities(entities)
 
 
 class DukaSensor(DukaPointEntity, SensorEntity):
@@ -138,3 +144,55 @@ class DukaSensor(DukaPointEntity, SensorEntity):
         self._attr_native_value = (
             current.name.lower() if isinstance(current, IntEnum) else current
         )
+
+
+class _UnitClock(DukaEntity, SensorEntity):
+    """The unit's clock and calendar, read as Home Assistant's local time.
+
+    The unit's clock has no time zone; *Set clock* writes Home Assistant's local time to it.
+    """
+
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+
+    def _watched(self) -> tuple[Key[Any], ...]:
+        return (PointKey.CLOCK_TIME, PointKey.CLOCK_DATE)
+
+    def _unit_time(self) -> datetime | None:
+        clock = self._current(PointKey.CLOCK_TIME)
+        calendar = self._current(PointKey.CLOCK_DATE)
+        if clock is None or calendar is None:
+            return None
+        return datetime.combine(calendar, clock, tzinfo=dt_util.get_default_time_zone())
+
+
+class DukaClock(_UnitClock):
+    """The date and time the unit's clock shows, as it was when last read."""
+
+    _attr_translation_key = CLOCK_KEY
+    _attr_device_class = SensorDeviceClass.TIMESTAMP
+
+    def __init__(self, data: DukaData) -> None:
+        super().__init__(data, CLOCK_KEY)
+
+    def _show(self) -> None:
+        self._attr_native_value = self._unit_time()
+
+
+class DukaClockOffset(_UnitClock):
+    """How many seconds the unit's clock is ahead of Home Assistant's, when it was last read."""
+
+    _attr_translation_key = CLOCK_OFFSET_KEY
+    _attr_device_class = SensorDeviceClass.DURATION
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_native_unit_of_measurement = UnitOfTime.SECONDS
+
+    def __init__(self, data: DukaData) -> None:
+        super().__init__(data, CLOCK_OFFSET_KEY)
+
+    def _show(self) -> None:
+        unit_time = self._unit_time()
+        read = self._client.value(PointKey.CLOCK_TIME)
+        if unit_time is None or read is None or read.timestamp is None:
+            self._attr_native_value = None
+        else:
+            self._attr_native_value = round(unit_time.timestamp() - read.timestamp)

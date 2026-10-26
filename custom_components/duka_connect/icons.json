@@ -113,6 +113,12 @@
       },
       "ip_address": {
         "default": "mdi:ip-network"
+      },
+      "clock": {
+        "default": "mdi:clock-outline"
+      },
+      "clock_offset": {
+        "default": "mdi:clock-alert-outline"
       }
     },
     "switch": {

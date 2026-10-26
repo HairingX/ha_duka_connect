@@ -18,7 +18,12 @@ from packaging.version import Version
 
 from custom_components.duka_connect.binary_sensor import BINARY_SENSORS
 from custom_components.duka_connect.button import BUTTONS
-from custom_components.duka_connect.const import BATTERY_LOW_KEY, SET_CLOCK_KEY
+from custom_components.duka_connect.const import (
+    BATTERY_LOW_KEY,
+    CLOCK_KEY,
+    CLOCK_OFFSET_KEY,
+    SET_CLOCK_KEY,
+)
 from custom_components.duka_connect.entity import DukaEntityDescription
 from custom_components.duka_connect.fan import PRESETS
 from custom_components.duka_connect.number import NUMBERS
@@ -40,14 +45,15 @@ PLATFORMS: dict[str, tuple[DukaEntityDescription, ...]] = {
 
 NOT_AN_ENTITY: dict[str, str] = {
     str(PointKey.POWER): "the fan entity's state is whether the unit runs, with its history",
-    str(PointKey.CLOCK_TIME): "the unit's clock has no time zone, which a timestamp needs; set by a button",
-    str(PointKey.CLOCK_DATE): "the unit's clock has no time zone, which a timestamp needs; set by a button",
+    str(PointKey.CLOCK_TIME): "shown with the calendar by the Clock and Clock offset sensors",
+    str(PointKey.CLOCK_DATE): "shown with the clock by the Clock and Clock offset sensors",
 }
 """Library points that are no entity of their own, with the reason."""
 
 NOT_DESCRIBED: dict[str, frozenset[str]] = {
     "binary_sensor": frozenset({BATTERY_LOW_KEY}),
     "button": frozenset({SET_CLOCK_KEY}),
+    "sensor": frozenset({CLOCK_KEY, CLOCK_OFFSET_KEY}),
     "fan": frozenset({"fan"}),
 }
 """Entities built from more than one point, or from none, by platform."""

@@ -229,6 +229,12 @@
       },
       "ip_address": {
         "name": "IP-adresse"
+      },
+      "clock": {
+        "name": "Ur"
+      },
+      "clock_offset": {
+        "name": "Urets afvigelse"
       }
     },
     "switch": {

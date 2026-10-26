@@ -35,3 +35,9 @@ CONF_BATTERY_LOW: Final = "battery_low"
 
 SET_CLOCK_KEY: Final = "set_clock"
 """The key of the button that sets the unit's clock to Home Assistant's."""
+
+CLOCK_KEY: Final = "clock"
+"""The key of the sensor showing the unit's clock and calendar."""
+
+CLOCK_OFFSET_KEY: Final = "clock_offset"
+"""The key of the sensor showing how far the unit's clock is from Home Assistant's."""

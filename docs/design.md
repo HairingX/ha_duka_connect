@@ -46,5 +46,9 @@ entity follows its points and the client's status, and sets its `_attr_` values 
 | `STALE` | shows the last good value |
 | `OFFLINE`, `MISSING`, or the unit does not answer | is unavailable |
 
+The unit's clock has no time zone. *Set clock* writes Home Assistant's local time to it, and the
+*Clock* sensor reads it back in the same time zone; *Clock offset* compares it with the time it
+was read, which stays meaningful between the readings, 15 minutes apart.
+
 A point the unit says it lacks gets no entity, and an entity of a point the unit no longer has
 is removed at the next setup.
