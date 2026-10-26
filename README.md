@@ -15,70 +15,62 @@ Duka One units with Wi-Fi, such as the Duka One Pro 50 S Wi-Fi and the Duka One 
 
 ## What you get
 
-The unit appears as one device. Its entities, by the names Home Assistant shows:
+The unit shows up as one device in Home Assistant. On its page, the entities are grouped the
+same way as here. Entities marked *hidden* are turned off at first: turn them on from the device
+page if you need them. An entity your unit does not have is not created.
 
-**Run the unit**
+### Controls
 
 | Entity | What it does |
 |---|---|
-| *(the device's name)* | The fan: turn the unit on and off, and set its speed. |
-| Speed | Low, medium, high, or manual. Keeps a history of the speed the unit ran at. |
-| Manual speed | The speed used when *Speed* is manual, 0 to 255. |
-| Ventilation mode | How the air moves; see [Ventilation modes](#ventilation-modes). |
-| Timer mode | Off, night (quiet) or party (boost) for a while. |
+| *(the unit's name)* | Turns the unit on and off, and sets its speed. |
+| Speed | Low, medium, high or manual. Its history shows which speed the unit ran at. |
+| Manual speed | The speed used when *Speed* is manual, from 0 to 255. |
+| Ventilation mode | How the air moves: see [Ventilation modes](#ventilation-modes). |
+| Timer mode | Off, night (quiet) or party (strong) for a while. |
 
-**See what the unit does**
+### Sensors
 
 | Entity | What it shows |
 |---|---|
 | Humidity | The room's humidity, in %. |
-| Fan 1 RPM, Fan 2 RPM | How fast each fan actually turns. |
-| Boost | On while the unit runs at boost, such as for high humidity. |
-| Humidity over threshold | On while the humidity is over *Humidity threshold*. |
-| Filter time left | Days until the filter should be changed. |
-| Time left on timer | Time left of the night or party mode. |
+| Alarm | None, warning or alarm, as the unit reports it. |
+| Filter | *Problem* when the filter needs changing. |
+| Filter time left | How long until the filter should be changed. |
+| Boost | *Running* while the unit runs extra strong, for example because of high humidity. |
+| Humidity over threshold | *On* while the humidity is over *Humidity threshold*. |
+| Fan 1 RPM, Fan 2 RPM | How fast each fan turns. |
+| Time left on timer | Time left of the night or party mode. *Hidden.* |
+| Relay sensor, 0-10 V sensor level, 0-10 V sensor over threshold | An external sensor wired to the unit, if there is one. *Hidden.* |
 
-**Warnings**
-
-| Entity | What it shows |
-|---|---|
-| Filter | Shows *Problem* when the filter needs changing. Press *Reset filter timer* after changing it. |
-| Alarm | Shows none, warning or alarm, as the unit reports it. Press *Reset alarms* to clear it. |
-| Clock battery | Shows *Low* when the unit's clock battery, a CR1220 coin cell, is running flat. *Clock battery voltage* shows its voltage. |
-
-**Settings**
-
-| Entity | What it sets |
-|---|---|
-| Humidity boost | Whether high humidity starts boost. |
-| Humidity threshold | The humidity that starts boost, 40 to 80 %. |
-| Boost off delay | How long boost runs on after the humidity has fallen, in minutes. |
-| Night mode duration, Party mode duration | How long each timer mode runs. |
-| Weekly schedule | Whether the unit follows the weekly schedule set in Duka's app. |
-| Cloud access | Whether Duka's app may reach the unit through Duka's cloud: from away, or from a phone on another network (VLAN) than the unit. Turn it off to keep the app out of the unit's settings, and on when you want to use the app. Whether the unit also refuses the app on its own network when it is off is not yet known. |
-
-**Buttons**
+### Configuration
 
 | Entity | What it does |
 |---|---|
-| Reset filter timer | Starts the filter countdown again, after a filter change. |
+| Humidity boost | Lets high humidity make the unit run extra strong. |
+| Humidity threshold | The humidity that does so, from 40 to 80 %. |
+| Boost off delay | How many minutes it keeps running strong after the humidity has fallen. |
+| Night mode duration, Party mode duration | How long each timer mode lasts. |
+| Weekly schedule | Lets the unit follow the weekly schedule set in Duka's app. |
+| Cloud access | Lets Duka's app reach the unit through Duka's cloud: from away, or from a phone on another network (VLAN). Turn it off to keep the app out; turn it on when you want to use the app. It shows what the unit reports; Home Assistant changes it only when you do. |
+| Reset filter timer | Press after changing the filter. |
 | Reset alarms | Clears the unit's alarms. |
 | Set clock | Sets the unit's clock to Home Assistant's time. The weekly schedule runs by this clock. |
+| Filter change interval | Days between filter changes. Only on units that have it. |
+| Relay sensor boost, 0-10 V sensor boost, 0-10 V sensor threshold | Settings for an external sensor wired to the unit. *Hidden.* |
+| Supply speed 1-3, Exhaust speed 1-3, Restore fan speeds | Separate speeds in and out for each speed step. Only on units that have them. *Hidden.* |
 
-**Turned off until you turn them on** (Settings > Devices & services > the device > entities):
+### Diagnostic
 
-| Entity | What it is |
+| Entity | What it shows |
 |---|---|
-| Relay sensor, Relay sensor boost | An external switch wired to the unit, and whether it starts boost. |
-| 0-10 V sensor level, 0-10 V sensor boost, 0-10 V sensor threshold, 0-10 V sensor over threshold | An external 0-10 V sensor wired to the unit, such as a CO2 sensor. |
-| Supply speed 1-3, Exhaust speed 1-3, Restore fan speeds | Separate in and out speeds for each preset speed, on units that have them. |
-| Firmware date, Unit type, IP address | Details for troubleshooting. |
+| Clock battery | *Low* when the unit's clock battery, a CR1220 coin cell, needs changing. |
+| Clock battery voltage | That battery's voltage. |
+| Operating time | How long the unit has run in all. |
+| Firmware version | The unit's software version, also shown on the device page. |
+| Firmware date, Unit type, IP address | Details for troubleshooting. *Hidden.* |
 
-**Shown only on units that have them:** Filter change interval (days between filter changes).
-
-**Details for troubleshooting:** Operating time, Firmware version, Clock battery voltage. The firmware and unit type are also shown on the device's page.
-
-An entity the unit does not have is not created. The Danish names are shown when Home Assistant is set to Danish.
+With Home Assistant set to Danish, the names are shown in Danish.
 
 ### Ventilation modes
 
