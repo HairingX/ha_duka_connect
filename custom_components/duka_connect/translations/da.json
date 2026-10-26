@@ -79,6 +79,15 @@
       },
       "rtc_battery_low": {
         "name": "Urbatteri lavt"
+      },
+      "humidity_over_threshold": {
+        "name": "Luftfugtighed over grænse"
+      },
+      "relay_sensor_active": {
+        "name": "Relæsensor"
+      },
+      "analog_sensor_over_threshold": {
+        "name": "0-10 V-sensor over grænse"
       }
     },
     "button": {
@@ -87,6 +96,12 @@
       },
       "reset_alarms": {
         "name": "Nulstil alarmer"
+      },
+      "restore_fan_speeds": {
+        "name": "Gendan ventilatorhastigheder"
+      },
+      "set_clock": {
+        "name": "Indstil ur"
       }
     },
     "fan": {
@@ -109,8 +124,35 @@
       "boost_off_delay": {
         "name": "Boost-efterløb"
       },
-      "rtc_battery_low_threshold": {
-        "name": "Grænse for lavt urbatteri"
+      "night_timer": {
+        "name": "Varighed af nattilstand"
+      },
+      "party_timer": {
+        "name": "Varighed af festtilstand"
+      },
+      "filter_interval": {
+        "name": "Interval for filterskift"
+      },
+      "analog_sensor_threshold": {
+        "name": "Grænse for 0-10 V-sensor"
+      },
+      "supply_speed_1": {
+        "name": "Indblæsning trin 1"
+      },
+      "exhaust_speed_1": {
+        "name": "Udsugning trin 1"
+      },
+      "supply_speed_2": {
+        "name": "Indblæsning trin 2"
+      },
+      "exhaust_speed_2": {
+        "name": "Udsugning trin 2"
+      },
+      "supply_speed_3": {
+        "name": "Indblæsning trin 3"
+      },
+      "exhaust_speed_3": {
+        "name": "Udsugning trin 3"
       }
     },
     "select": {
@@ -166,11 +208,32 @@
       },
       "unit_type": {
         "name": "Enhedstype"
+      },
+      "fan2_rpm": {
+        "name": "Ventilator 2 hastighed"
+      },
+      "analog_sensor_level": {
+        "name": "0-10 V-sensor"
+      },
+      "ip_address": {
+        "name": "IP-adresse"
       }
     },
     "switch": {
       "humidity_sensor_enabled": {
         "name": "Fugtstyret boost"
+      },
+      "weekly_schedule": {
+        "name": "Ugeprogram"
+      },
+      "cloud_enabled": {
+        "name": "Cloud-adgang"
+      },
+      "relay_sensor_enabled": {
+        "name": "Relæstyret boost"
+      },
+      "analog_sensor_enabled": {
+        "name": "0-10 V-styret boost"
       }
     }
   },
@@ -186,6 +249,19 @@
     },
     "no_answer": {
       "message": "Enheden svarede ikke."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "description": "Enheden har ingen sådan indstilling; Home Assistant bruger den til alarmen for lavt urbatteri.",
+        "data": {
+          "battery_low": "Urbatteri lavt under (mV)"
+        },
+        "data_description": {
+          "battery_low": "Et nyt CR1220 giver omkring 3000 mV; intet dokument siger, hvornår Duka-appen kalder det fladt."
+        }
+      }
     }
   }
 }

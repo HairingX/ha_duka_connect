@@ -47,9 +47,12 @@ obvious from the name - one or two lines, no narrative.
 - Test tools, Home Assistant and the library are pinned in `requirements-test.txt`:
   `pip install -r requirements-test.txt`. They need Python 3.14, as the pinned Home Assistant
   does, on Linux or WSL.
-- The pins agree: the manifest's requirement is the library version the tests run, and
-  `hacs.json` requires the Home Assistant version they run.
+- The pins agree, and tests enforce it: the manifest's requirement is the library version the
+  tests run and the one `requirements-test.txt` pins, and `hacs.json` requires the Home
+  Assistant version they run.
 - A test fails when Home Assistant reports this integration using something deprecated.
+- Every point the library has is an entity, or is listed with the reason it is not; a test
+  fails for a new point that is neither.
 - An existing installation keeps its entities: a unique id is the unit's name and the point's
   key, and a test holds every entity a Duka One has. Removing or moving one is agreed with the
   user first.
@@ -65,7 +68,9 @@ release. After any change to the integration or to the libraries it uses:
 1. Test against the newest Home Assistant release: pin it in `requirements-test.txt` (through
    pytest-homeassistant-custom-component) and `hacs.json`, then run the tests, pyright and
    hassfest. A deprecation Home Assistant reports fails the tests.
-2. Read the Integration Quality Scale rules and HACS's publishing requirements again.
+2. Read the Integration Quality Scale rules and HACS's publishing requirements again, and bring
+   `quality_scale.yaml` up to date; a test checks it lists every rule, with a reason for each
+   exemption and each rule not yet met.
 3. Read the Home Assistant developer blog since the last check for changes to what integrations
    do.
 4. Try the integration on a real Duka One.

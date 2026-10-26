@@ -6,6 +6,12 @@
       },
       "boost": {
         "default": "mdi:fan-plus"
+      },
+      "relay_sensor_active": {
+        "default": "mdi:electric-switch"
+      },
+      "analog_sensor_over_threshold": {
+        "default": "mdi:gauge-full"
       }
     },
     "button": {
@@ -14,14 +20,47 @@
       },
       "reset_alarms": {
         "default": "mdi:alarm-light-off"
+      },
+      "restore_fan_speeds": {
+        "default": "mdi:fan-off"
+      },
+      "set_clock": {
+        "default": "mdi:clock-edit-outline"
       }
     },
     "number": {
       "boost_off_delay": {
         "default": "mdi:timer-outline"
       },
-      "rtc_battery_low_threshold": {
-        "default": "mdi:battery-alert-variant-outline"
+      "night_timer": {
+        "default": "mdi:weather-night"
+      },
+      "party_timer": {
+        "default": "mdi:party-popper"
+      },
+      "filter_interval": {
+        "default": "mdi:air-filter"
+      },
+      "analog_sensor_threshold": {
+        "default": "mdi:gauge"
+      },
+      "supply_speed_1": {
+        "default": "mdi:fan-chevron-down"
+      },
+      "supply_speed_2": {
+        "default": "mdi:fan-chevron-down"
+      },
+      "supply_speed_3": {
+        "default": "mdi:fan-chevron-down"
+      },
+      "exhaust_speed_1": {
+        "default": "mdi:fan-chevron-up"
+      },
+      "exhaust_speed_2": {
+        "default": "mdi:fan-chevron-up"
+      },
+      "exhaust_speed_3": {
+        "default": "mdi:fan-chevron-up"
       }
     },
     "select": {
@@ -59,11 +98,32 @@
       },
       "timer_countdown": {
         "default": "mdi:timer-sand"
+      },
+      "fan2_rpm": {
+        "default": "mdi:fan"
+      },
+      "analog_sensor_level": {
+        "default": "mdi:gauge"
+      },
+      "ip_address": {
+        "default": "mdi:ip-network"
       }
     },
     "switch": {
       "humidity_sensor_enabled": {
         "default": "mdi:water-percent"
+      },
+      "weekly_schedule": {
+        "default": "mdi:calendar-clock"
+      },
+      "cloud_enabled": {
+        "default": "mdi:cloud"
+      },
+      "relay_sensor_enabled": {
+        "default": "mdi:electric-switch"
+      },
+      "analog_sensor_enabled": {
+        "default": "mdi:gauge"
       }
     }
   }

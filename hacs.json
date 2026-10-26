@@ -1,6 +1,6 @@
 {
   "name": "Duka Connect",
-  "homeassistant": "2026.10.0",
+  "homeassistant": "2026.10.2",
   "zip_release": true,
   "filename": "duka_connect.zip"
 }

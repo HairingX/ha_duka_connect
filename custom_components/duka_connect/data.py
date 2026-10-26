@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import asyncio
-from collections.abc import Callable
 from dataclasses import dataclass, field
 
 from duka_connect import Client, Key
@@ -25,16 +24,7 @@ class DukaData:
     unique_ids: set[str] = field(default_factory=set[str])
     """The unique id of every entity built for the entry, disabled ones included."""
     battery_low: int = BATTERY_LOW_DEFAULT
-    """Millivolts under which the clock battery counts as low."""
-    battery_low_listeners: list[Callable[[], None]] = field(
-        default_factory=list[Callable[[], None]], repr=False
-    )
-
-    def set_battery_low(self, millivolts: int) -> None:
-        """Set the clock battery's low limit, and tell those who follow it."""
-        self.battery_low = millivolts
-        for listener in list(self.battery_low_listeners):
-            listener()
+    """Millivolts under which the clock battery counts as low, from the entry's options."""
 
 
 def new_client(host: str, device_id: str, password: str) -> Client:

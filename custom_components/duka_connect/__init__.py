@@ -4,14 +4,15 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from collections.abc import Callable
 
-from duka_connect import CannotConnectError, Client, UnsupportedDeviceError
+from duka_connect import CannotConnectError, Client, Status, UnsupportedDeviceError
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PASSWORD, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryError, ConfigEntryNotReady
 from homeassistant.helpers import entity_registry as er
 
-from .const import CONF_DEVICE_ID, DOMAIN, POLL_TICK
+from .const import BATTERY_LOW_DEFAULT, CONF_BATTERY_LOW, CONF_DEVICE_ID, DOMAIN, POLL_TICK
 from .data import DukaConfigEntry, DukaData, new_client
 
 _LOGGER = logging.getLogger(__name__)
@@ -49,13 +50,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: DukaConfigEntry) -> bool
         ) from err
 
     try:
-        entry.runtime_data = DukaData(client=client, name=name)
+        entry.runtime_data = DukaData(
+            client=client,
+            name=name,
+            battery_low=int(entry.options.get(CONF_BATTERY_LOW, BATTERY_LOW_DEFAULT)),
+        )
         await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
         _remove_lost_entities(hass, entry)
     except BaseException:
         await client.disconnect()
         raise
 
+    entry.async_on_unload(_log_when_unavailable(client, name))
     # Polling starts once the entities have subscribed: the client reads what is wanted.
     entry.runtime_data.poller = entry.async_create_background_task(
         hass, _poll(client), f"{DOMAIN} poll {entry.title}"
@@ -74,6 +80,23 @@ async def async_unload_entry(hass: HomeAssistant, entry: DukaConfigEntry) -> boo
         await asyncio.wait([data.poller])
     await data.client.disconnect()
     return True
+
+
+def _log_when_unavailable(client: Client, name: str) -> Callable[[], None]:
+    """Log once when the unit stops answering, and once when it answers again."""
+    answered = True
+
+    @callback
+    def status_changed(status: Status) -> None:
+        nonlocal answered
+        if status is Status.DISCONNECTED and answered:
+            _LOGGER.info("%s does not answer", name)
+            answered = False
+        elif status is Status.CONNECTED and not answered:
+            _LOGGER.info("%s answers again", name)
+            answered = True
+
+    return client.subscribe_status(status_changed)
 
 
 @callback
