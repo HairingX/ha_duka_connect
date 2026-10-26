@@ -1,4 +1,4 @@
-"""Choices of the unit: which way the air moves, and which timed mode runs."""
+"""Choices of the unit: the fan speed, which way the air moves, and which timed mode runs."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from enum import IntEnum
 from typing import Any
 
-from duka_connect import Key, PointKey, TimerMode, VentilationMode
+from duka_connect import Key, PointKey, Speed, TimerMode, VentilationMode
 from homeassistant.components.select import SelectEntity, SelectEntityDescription
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
@@ -35,6 +35,7 @@ def _select(point: Key[Any], states: type[IntEnum]) -> DukaSelectDescription:
 
 
 SELECTS: tuple[DukaSelectDescription, ...] = (
+    _select(PointKey.SPEED, Speed),
     _select(PointKey.VENTILATION_MODE, VentilationMode),
     _select(PointKey.TIMER_MODE, TimerMode),
 )

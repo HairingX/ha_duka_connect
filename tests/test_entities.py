@@ -49,6 +49,7 @@ async def test_the_unit_has_every_entity(hass: HomeAssistant, loaded: DukaData) 
             "night_timer", "party_timer", "filter_interval", "analog_sensor_threshold",
             "supply_speed_1", "exhaust_speed_1", "supply_speed_2", "exhaust_speed_2",
             "supply_speed_3", "exhaust_speed_3", "restore_fan_speeds", "set_clock",
+            "speed", "manual_speed",
         )
     )
 
@@ -287,3 +288,30 @@ async def test_a_timer_duration_is_written_in_minutes(
         blocking=True,
     )
     assert unit.values[0x0302] == bytes([30, 1])
+
+
+async def test_the_speed_has_its_own_entity_with_its_history(
+    hass: HomeAssistant, loaded: DukaData, unit: SimulatedDuka
+) -> None:
+    assert state(hass, "select", "speed") == "medium"
+    await hass.services.async_call(
+        "select", "select_option",
+        {"entity_id": entity_id(hass, "select", "speed"), "option": "high"},
+        blocking=True,
+    )
+    assert unit.values[0x02] == bytes([Speed.HIGH])
+    assert state(hass, "fan", "fan") == STATE_ON
+    current = hass.states.get(entity_id(hass, "fan", "fan"))
+    assert current is not None and current.attributes["preset_mode"] == "high"
+
+
+async def test_the_manual_speed_has_its_own_entity(
+    hass: HomeAssistant, loaded: DukaData, unit: SimulatedDuka
+) -> None:
+    assert state(hass, "number", "manual_speed") == "128.0"
+    await hass.services.async_call(
+        "number", "set_value",
+        {"entity_id": entity_id(hass, "number", "manual_speed"), "value": 200},
+        blocking=True,
+    )
+    assert unit.values[0x44] == bytes([200])

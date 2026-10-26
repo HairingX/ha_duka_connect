@@ -38,9 +38,7 @@ PLATFORMS: dict[str, tuple[DukaEntityDescription, ...]] = {
 }
 
 NOT_AN_ENTITY: dict[str, str] = {
-    str(PointKey.POWER): "the fan entity turns the unit on and off",
-    str(PointKey.SPEED): "the fan entity's preset modes and percentage",
-    str(PointKey.MANUAL_SPEED): "the fan entity's percentage",
+    str(PointKey.POWER): "the fan entity's state is whether the unit runs, with its history",
     str(PointKey.CLOCK_TIME): "the unit's clock has no time zone, which a timestamp needs; set by a button",
     str(PointKey.CLOCK_DATE): "the unit's clock has no time zone, which a timestamp needs; set by a button",
 }
@@ -173,6 +171,15 @@ QUALITY_SCALE_RULES = frozenset({
 })
 """The rules of Home Assistant's Integration Quality Scale, as its developer documentation lists
 them. hassfest does not check this file for a custom integration, so this test does."""
+
+
+FAN_SHOWS = (PointKey.SPEED, PointKey.MANUAL_SPEED)
+"""What the fan entity shows as attributes, which have no history or statistics of their own."""
+
+
+@pytest.mark.parametrize("point", [str(point) for point in FAN_SHOWS])
+def test_what_the_fan_shows_is_also_an_entity_of_its_own(point: str) -> None:
+    assert point in _described()
 
 
 def test_the_quality_scale_states_every_rule_and_explains_every_exemption() -> None:

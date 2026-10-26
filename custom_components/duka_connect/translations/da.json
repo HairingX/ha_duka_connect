@@ -153,6 +153,9 @@
       },
       "exhaust_speed_3": {
         "name": "Udsugning trin 3"
+      },
+      "manual_speed": {
+        "name": "Manuel hastighed"
       }
     },
     "select": {
@@ -170,6 +173,15 @@
           "off": "Fra",
           "night": "Nat",
           "party": "Fest"
+        }
+      },
+      "speed": {
+        "name": "Hastighed",
+        "state": {
+          "low": "Lav",
+          "medium": "Mellem",
+          "high": "Høj",
+          "manual": "Manuel"
         }
       }
     },

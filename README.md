@@ -18,6 +18,7 @@ Duka One units with Wi-Fi, such as the Duka One Pro 50 S Wi-Fi and the Duka One 
 | Entity | What it is |
 |---|---|
 | Fan | On and off, the three preset speeds, and any speed as a percentage (the manual speed) |
+| Speed, manual speed | The fan's speed and manual speed as entities of their own, with their history |
 | Ventilation mode | Extract, heat recovery or supply |
 | Timer mode | Off, night or party; with the night and party durations as settings |
 | Humidity, fan speeds | Measurements; humidity over its threshold as a flag |

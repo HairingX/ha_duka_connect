@@ -61,6 +61,9 @@
       },
       "exhaust_speed_3": {
         "default": "mdi:fan-chevron-up"
+      },
+      "manual_speed": {
+        "default": "mdi:fan"
       }
     },
     "select": {
@@ -69,6 +72,9 @@
       },
       "timer_mode": {
         "default": "mdi:timer-cog-outline"
+      },
+      "speed": {
+        "default": "mdi:fan-speed-2"
       }
     },
     "sensor": {
