@@ -123,6 +123,11 @@ or 60 seconds; the filter, clock battery and operating time every 15 minutes. A 
 Home Assistant shows at once. A change made with the unit's buttons, its remote or Duka's app
 shows within those times.
 
+What a change affects is read sooner than its own time. The fans' speeds are read 3 seconds after
+the speed changes, and again until they have settled. When the unit's warning or alarm clears,
+the clock battery and the filter are read 10 seconds later, and again every 10 seconds while
+they change, for up to 2 minutes. What a button changes is read a second after it is pressed.
+
 ## Known limitations
 
 - **Not yet tested on a real unit**: some values may be missing or wrong.

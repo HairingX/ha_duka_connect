@@ -133,7 +133,7 @@ async def test_selecting_a_ventilation_mode_writes_it(
 
 
 async def test_the_filter_button_resets_the_filter(
-    hass: HomeAssistant, loaded: DukaData, unit: SimulatedDuka
+    hass: HomeAssistant, loaded: DukaData, unit: SimulatedDuka, clock: FakeClock
 ) -> None:
     unit.values[0x88] = b"\x01"
     await loaded.client.refresh()
@@ -143,6 +143,9 @@ async def test_the_filter_button_resets_the_filter(
         "button", "press",
         {"entity_id": entity_id(hass, "button", "reset_filter_timer")}, blocking=True,
     )
+    clock.advance(1)
+    await loaded.client.poll()
+    await hass.async_block_till_done()
     assert state(hass, "binary_sensor", "filter_replace") == STATE_OFF
 
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from duka_connect import Status
 from homeassistant.const import CONF_HOST, CONF_PASSWORD
 from homeassistant.core import HomeAssistant
 
@@ -26,12 +27,12 @@ async def async_get_config_entry_diagnostics(
     client = entry.runtime_data.client
     values: dict[str, Any] = {}
     for name, point in sorted(client.points.items()):
-        current = None if point.command else client.value(point.key)
+        current = client.value(point.key) if point.readable else None
         if current is not None:
             values[name] = {
                 "value": str(current.value) if current.value is not None else None,
                 "quality": current.quality.name,
-                "raw": None if current.raw is None else current.raw.hex(),
+                "raw": bytes(current.raw).hex() or None,
                 "certainty": point.certainty.name,
             }
     return {
@@ -43,6 +44,6 @@ async def async_get_config_entry_diagnostics(
             },
         },
         "unit_type": client.unit_type,
-        "status": client.status.name,
+        "connected": client.status(Status.CONNECTED).value,
         "values": values,
     }

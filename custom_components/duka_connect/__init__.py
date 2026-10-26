@@ -6,7 +6,7 @@ import asyncio
 import logging
 from collections.abc import Callable
 
-from duka_connect import CannotConnectError, Client, Status, UnsupportedDeviceError
+from duka_connect import CannotConnectError, Client, DataValue, Status, UnsupportedDeviceError
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PASSWORD, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryError, ConfigEntryNotReady
@@ -90,16 +90,16 @@ def _log_when_unavailable(client: Client, name: str) -> Callable[[], None]:
     answered = True
 
     @callback
-    def status_changed(status: Status) -> None:
+    def status_changed(status: Status, old: DataValue[bool] | None, new: DataValue[bool]) -> None:
         nonlocal answered
-        if status is Status.DISCONNECTED and answered:
+        if not new.value and answered:
             _LOGGER.info("%s does not answer", name)
             answered = False
-        elif status is Status.CONNECTED and not answered:
+        elif new.value and not answered:
             _LOGGER.info("%s answers again", name)
             answered = True
 
-    return client.subscribe_status(status_changed)
+    return client.subscribe_status(Status.CONNECTED, status_changed)
 
 
 @callback
