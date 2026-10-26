@@ -3,6 +3,7 @@
 A Home Assistant integration, installed through HACS, for Duka One ventilation units, reached
 over their UDP protocol on the local network. The unit itself is modelled by the `duka_connect`
 library; this repository only turns it into Home Assistant devices and entities.
+How and why it is built as it is: `docs/design.md`.
 
 ## Comments and docstrings
 

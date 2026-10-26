@@ -86,3 +86,16 @@ async def test_a_unit_that_stops_answering_is_logged_once_and_again_when_it_answ
     await loaded.client.poll()
     messages = [r.getMessage() for r in caplog.records if r.name == "custom_components.duka_connect"]
     assert messages == ["Duka One does not answer", "Duka One answers again"]
+
+
+async def test_polling_disabled_in_the_system_options_starts_no_polling(
+    hass: HomeAssistant, unit: SimulatedDuka
+) -> None:
+    entry = MockConfigEntry(
+        domain=DOMAIN, unique_id=DEVICE_ID, data=entry_data(), pref_disable_polling=True
+    )
+    await set_up(hass, entry)
+    data: DukaData = entry.runtime_data
+    assert data.poller is None
+    assert await hass.config_entries.async_unload(entry.entry_id)
+    await hass.async_block_till_done()
