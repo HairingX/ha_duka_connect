@@ -192,7 +192,7 @@ class DukaClockOffset(_UnitClock):
     def _show(self) -> None:
         unit_time = self._unit_time()
         read = self._client.value(PointKey.CLOCK_TIME)
-        if unit_time is None or read is None or read.timestamp is None:
+        if unit_time is None or read is None:
             self._attr_native_value = None
         else:
-            self._attr_native_value = round(unit_time.timestamp() - read.timestamp)
+            self._attr_native_value = round((unit_time - read.timestamp).total_seconds())

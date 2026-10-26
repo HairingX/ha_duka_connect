@@ -119,9 +119,11 @@ class DukaNumber(DukaPointEntity, NumberEntity):
     def __init__(self, data: DukaData, description: DukaNumberDescription) -> None:
         self._setting = description.point
         self._percentage = description.percentage
-        point = data.client.points[str(description.point)]
-        self._attr_native_min_value = 0.0 if self._percentage else float(point.minimum or 0)
-        self._attr_native_max_value = 100.0 if self._percentage else float(point.maximum or 255)
+        limits = data.client.points[description.point].limits
+        minimum = limits.min if limits is not None and limits.min is not None else 0
+        maximum = limits.max if limits is not None and limits.max is not None else 255
+        self._attr_native_min_value = 0.0 if self._percentage else float(minimum)
+        self._attr_native_max_value = 100.0 if self._percentage else float(maximum)
         self._attr_native_step = 1
         super().__init__(data, description)
 

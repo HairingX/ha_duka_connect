@@ -7,13 +7,12 @@ from dataclasses import dataclass
 from typing import Any
 
 from duka_connect import (
-    CannotConnectError,
-    PointKey,
     DataValue,
     Key,
+    PointKey,
     Quality,
     Status,
-    WriteError,
+    Write,
 )
 from homeassistant.core import callback
 from homeassistant.exceptions import HomeAssistantError
@@ -105,10 +104,7 @@ class DukaEntity(Entity):
 
         A unit that does not answer leaves the entity unavailable, as its status says.
         """
-        try:
-            await self._client.refresh(list(self._watched()))
-        except CannotConnectError:
-            _LOGGER.debug("The unit did not answer an update of %s", self.entity_id)
+        await self._client.refresh(list(self._watched()))
 
     def _show(self) -> None:
         """Set this entity's state from the client's current values."""
@@ -117,7 +113,7 @@ class DukaEntity(Entity):
         """Follow the watched keys and whether the unit answers."""
         for key in self._watched():
             self.async_on_remove(self._client.subscribe(key, self._on_value))
-        self.async_on_remove(self._client.subscribe_status(self._on_status))
+        self.async_on_remove(self._client.subscribe_status(Status.CONNECTED, self._on_status))
         # Each subscription has told its current value; HA writes the state once this returns.
         self._added = True
 
@@ -128,14 +124,14 @@ class DukaEntity(Entity):
         self._changed()
 
     @callback
-    def _on_status(self, status: Status) -> None:
+    def _on_status(self, status: Status, old: DataValue[bool] | None, new: DataValue[bool]) -> None:
         self._changed()
 
     @callback
     def _changed(self) -> None:
         """Recompute the state: available while the unit answers and every required value
         can be shown."""
-        self._attr_available = self._client.status is Status.CONNECTED and all(
+        self._attr_available = bool(self._client.status(Status.CONNECTED).value) and all(
             usable(self._client.value(key)) for key in self._required()
         )
         self._show()
@@ -153,16 +149,12 @@ class DukaEntity(Entity):
         is sent.
         """
         _LOGGER.debug("Writing %s", writes)
-        try:
-            await self._client.write_many(writes)
-        except WriteError as err:
-            raise HomeAssistantError(
-                translation_domain=DOMAIN, translation_key="write_refused"
-            ) from err
-        except CannotConnectError as err:
-            raise HomeAssistantError(
-                translation_domain=DOMAIN, translation_key="no_answer"
-            ) from err
+        if await self._client.write_sequence([Write(key, value) for key, value in writes]):
+            return
+        answered = self._client.status(Status.CONNECTED).value
+        raise HomeAssistantError(
+            translation_domain=DOMAIN, translation_key="write_refused" if answered else "no_answer"
+        )
 
 
 class DukaPointEntity(DukaEntity):

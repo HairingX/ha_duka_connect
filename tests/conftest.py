@@ -11,9 +11,10 @@ from typing import Any
 import pytest
 import pytest_socket
 from duka_connect import Client, DiscoveredDevice, discover
-from duka_connect.testing import SimulatedDuka
+from duka_connect.testing import FakeClock, SimulatedDuka
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PASSWORD
 from homeassistant.core import HomeAssistant
+from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.duka_connect import const
@@ -25,19 +26,6 @@ PASSWORD = "1111"
 NAME = "Duka One"
 HOST = "127.0.0.1"
 """The simulated unit listens here, on a port of its own."""
-
-
-class FakeClock:
-    """A monotonic clock that moves only when a test advances it."""
-
-    def __init__(self) -> None:
-        self.now = 1000.0
-
-    def __call__(self) -> float:
-        return self.now
-
-    def advance(self, seconds: float) -> None:
-        self.now += seconds
 
 
 @pytest.fixture(autouse=True)
@@ -71,8 +59,11 @@ async def unit() -> AsyncIterator[SimulatedDuka]:
 
 @pytest.fixture
 def clock() -> FakeClock:
-    """The clients' clock: it moves only when a test advances it, so nothing is read by itself."""
-    return FakeClock()
+    """The clients' clock: it moves only when a test advances it, so nothing is read by itself.
+
+    Its wall clock starts at the real time, as the unit's clock is set from it.
+    """
+    return FakeClock(now=dt_util.utcnow())
 
 
 @pytest.fixture

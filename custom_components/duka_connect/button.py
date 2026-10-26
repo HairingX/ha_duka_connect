@@ -27,7 +27,7 @@ class DukaButtonDescription(DukaEntityDescription, ButtonEntityDescription):
     A command has no value to read, so whether the unit has it is told by a point it acts on.
     """
 
-    point: Key[None]
+    point: Key[bool]
     requires: Key[Any] | None = None
 
 
@@ -82,7 +82,7 @@ class DukaButton(DukaEntity, ButtonEntity):
 
     async def async_press(self) -> None:
         """Send the command; what it changes is read back."""
-        await self._write([(self._command, None)])
+        await self._write([(self._command, True)])
 
 
 class DukaSetClock(DukaEntity, ButtonEntity):
