@@ -5,7 +5,10 @@
         "default": "mdi:air-filter"
       },
       "boost": {
-        "default": "mdi:fan-plus"
+        "default": "mdi:fan-plus",
+        "state": {
+          "off": "mdi:fan"
+        }
       },
       "relay_sensor_active": {
         "default": "mdi:electric-switch"
@@ -74,7 +77,13 @@
         "default": "mdi:timer-cog-outline"
       },
       "speed": {
-        "default": "mdi:fan-speed-2"
+        "default": "mdi:fan-speed-2",
+        "state": {
+          "low": "mdi:fan-speed-1",
+          "medium": "mdi:fan-speed-2",
+          "high": "mdi:fan-speed-3",
+          "manual": "mdi:fan-auto"
+        }
       }
     },
     "sensor": {
@@ -136,6 +145,20 @@
       },
       "analog_sensor_enabled": {
         "default": "mdi:gauge"
+      }
+    },
+    "fan": {
+      "fan": {
+        "state_attributes": {
+          "preset_mode": {
+            "default": "mdi:fan",
+            "state": {
+              "low": "mdi:fan-speed-1",
+              "medium": "mdi:fan-speed-2",
+              "high": "mdi:fan-speed-3"
+            }
+          }
+        }
       }
     }
   }
