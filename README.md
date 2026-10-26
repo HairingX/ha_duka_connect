@@ -55,7 +55,7 @@ page if you need them. An entity your unit does not have is not created.
 | Cloud access | Lets Duka's app reach the unit through Duka's cloud: from away, or from a phone on another network (VLAN). Turn it off to keep the app out; turn it on when you want to use the app. It shows what the unit reports; Home Assistant changes it only when you do. |
 | Reset filter timer | Press after changing the filter. |
 | Reset alarms | Clears the unit's alarms. |
-| Set clock | Sets the unit's clock to Home Assistant's time. The weekly schedule runs by this clock. |
+| Set clock | Sets the unit's clock to Home Assistant's time. The weekly schedule runs by this clock; *Clock* and *Clock offset* show how it stands. |
 | Filter change interval | Days between filter changes. Only on units that have it. |
 | Relay sensor boost, 0-10 V sensor boost, 0-10 V sensor threshold | Settings for an external sensor wired to the unit. *Hidden.* |
 | Supply speed 1-3, Exhaust speed 1-3, Restore fan speeds | Separate speeds in and out for each speed step. Only on units that have them. *Hidden.* |
@@ -66,6 +66,8 @@ page if you need them. An entity your unit does not have is not created.
 |---|---|
 | Clock battery | *Low* when the unit's clock battery, a CR1220 coin cell, needs changing. |
 | Clock battery voltage | That battery's voltage. |
+| Clock | The date and time the unit's clock shows, as of its last reading (every 15 minutes). |
+| Clock offset | How many seconds the unit's clock is ahead (+) or behind (−) Home Assistant's. Press *Set clock* to make it 0. |
 | Operating time | How long the unit has run in all. |
 | Firmware version | The unit's software version, also shown on the device page. |
 | Firmware date, Unit type, IP address | Details for troubleshooting. *Hidden.* |

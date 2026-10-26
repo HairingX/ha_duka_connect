@@ -4,13 +4,16 @@ from __future__ import annotations
 
 from duka_connect import Speed, VentilationMode
 from duka_connect.testing import SimulatedDuka
-from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE
+from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 
+from datetime import datetime
+
 import pytest
+from homeassistant.util import dt as dt_util
 from freezegun.api import FrozenDateTimeFactory
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
@@ -50,7 +53,7 @@ async def test_the_unit_has_every_entity(hass: HomeAssistant, loaded: DukaData) 
             "night_timer", "party_timer", "filter_interval", "analog_sensor_threshold",
             "supply_speed_1", "exhaust_speed_1", "supply_speed_2", "exhaust_speed_2",
             "supply_speed_3", "exhaust_speed_3", "restore_fan_speeds", "set_clock",
-            "speed", "manual_speed",
+            "speed", "manual_speed", "clock", "clock_offset",
         )
     )
 
@@ -349,3 +352,45 @@ async def test_high_humidity_is_a_moisture_sensor(hass: HomeAssistant, loaded: D
     assert current is not None
     assert current.attributes["device_class"] == "moisture"
     assert current.attributes["friendly_name"] == "Duka One High humidity"
+
+
+async def test_the_clock_shows_what_the_unit_thinks_the_time_is(
+    hass: HomeAssistant, loaded: DukaData
+) -> None:
+    shown = dt_util.parse_datetime(state(hass, "sensor", "clock"))
+    expected = datetime(2026, 10, 26, 12, 30, 15, tzinfo=dt_util.get_default_time_zone())
+    assert shown == expected
+
+
+async def test_after_setting_the_clock_it_is_no_more_than_a_second_off(
+    hass: HomeAssistant, loaded: DukaData
+) -> None:
+    await hass.services.async_call(
+        "button", "press", {"entity_id": entity_id(hass, "button", "set_clock")}, blocking=True
+    )
+    await hass.async_block_till_done()
+    assert abs(float(state(hass, "sensor", "clock_offset"))) <= 1
+
+
+async def test_a_unit_without_a_clock_has_no_clock_sensors(
+    hass: HomeAssistant, config_entry: MockConfigEntry, unit: SimulatedDuka
+) -> None:
+    unit.unsupported.add(0x70)
+    config_entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+    registry = er.async_get(hass)
+    for key in ("clock", "clock_offset"):
+        assert registry.async_get_entity_id("sensor", DOMAIN, f"{NAME}_{key}") is None
+    await hass.config_entries.async_unload(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+
+async def test_a_clock_the_unit_holds_no_valid_date_for_is_unknown(
+    hass: HomeAssistant, loaded: DukaData, unit: SimulatedDuka
+) -> None:
+    unit.values[0x70] = bytes([31, 1, 13, 26])
+    await loaded.client.refresh()
+    await hass.async_block_till_done()
+    assert state(hass, "sensor", "clock") == STATE_UNKNOWN
+    assert state(hass, "sensor", "clock_offset") == STATE_UNKNOWN
