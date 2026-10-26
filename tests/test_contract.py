@@ -20,6 +20,7 @@ from custom_components.duka_connect.binary_sensor import BINARY_SENSORS
 from custom_components.duka_connect.button import BUTTONS
 from custom_components.duka_connect.const import BATTERY_LOW_KEY, SET_CLOCK_KEY
 from custom_components.duka_connect.entity import DukaEntityDescription
+from custom_components.duka_connect.fan import PRESETS
 from custom_components.duka_connect.number import NUMBERS
 from custom_components.duka_connect.select import SELECTS
 from custom_components.duka_connect.sensor import SENSORS
@@ -97,6 +98,21 @@ def test_every_entity_has_a_name(platform: str) -> None:
     descriptions: tuple[EntityDescription, ...] = PLATFORMS.get(platform, ())
     expected = {d.translation_key for d in descriptions} | NOT_DESCRIBED.get(platform, frozenset())
     assert expected == set(names)
+
+
+@pytest.mark.parametrize("language", ["en", "da"])
+def test_every_state_an_entity_can_take_has_a_name(language: str) -> None:
+    """A select's options and an enum sensor's are what automations offer to choose from."""
+    names = _translations(language)["entity"]
+    for platform, descriptions in (("select", SELECTS), ("sensor", SENSORS)):
+        for description in descriptions:
+            options = cast(list[str] | None, getattr(description, "options", None))
+            if options is None:
+                continue
+            states = set(names[platform][description.key].get("state", {}))
+            assert states == set(options), f"{language} {platform}.{description.key}"
+    presets = names["fan"]["fan"]["state_attributes"]["preset_mode"]["state"]
+    assert set(presets) == set(PRESETS), f"{language} fan.fan preset_mode"
 
 
 def test_every_icon_belongs_to_a_translated_entity() -> None:
