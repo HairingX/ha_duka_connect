@@ -306,16 +306,31 @@ async def test_the_speed_has_its_own_entity_with_its_history(
     assert current is not None and current.attributes["preset_mode"] == "high"
 
 
-async def test_the_manual_speed_has_its_own_entity(
+async def test_the_manual_speed_is_shown_in_percent_as_the_fan_shows_it(
     hass: HomeAssistant, loaded: DukaData, unit: SimulatedDuka
 ) -> None:
-    assert state(hass, "number", "manual_speed") == "128.0"
     await hass.services.async_call(
-        "number", "set_value",
-        {"entity_id": entity_id(hass, "number", "manual_speed"), "value": 200},
+        "fan", "set_percentage",
+        {"entity_id": entity_id(hass, "fan", "fan"), "percentage": 40},
         blocking=True,
     )
-    assert unit.values[0x44] == bytes([200])
+    fan = hass.states.get(entity_id(hass, "fan", "fan"))
+    manual = hass.states.get(entity_id(hass, "number", "manual_speed"))
+    assert fan is not None and manual is not None
+    assert manual.state == f"{float(fan.attributes['percentage'])}"
+    assert (manual.attributes["min"], manual.attributes["max"]) == (0, 100)
+
+
+async def test_a_manual_speed_in_percent_is_written_on_the_units_scale(
+    hass: HomeAssistant, loaded: DukaData, unit: SimulatedDuka
+) -> None:
+    for percentage, manual in ((100, 255), (50, 128), (0, 0)):
+        await hass.services.async_call(
+            "number", "set_value",
+            {"entity_id": entity_id(hass, "number", "manual_speed"), "value": percentage},
+            blocking=True,
+        )
+        assert unit.values[0x44] == bytes([manual])
 
 
 async def test_the_device_carries_the_firmware_and_unit_type(

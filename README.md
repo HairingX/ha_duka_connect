@@ -25,7 +25,7 @@ page if you need them. An entity your unit does not have is not created.
 |---|---|
 | *(the unit's name)* | Turns the unit on and off, and sets its speed. |
 | Speed | Low, medium, high or manual. Its history shows which speed the unit ran at. |
-| Manual speed | The speed used when *Speed* is manual, from 0 to 255. |
+| Manual speed | The speed used when *Speed* is manual, in %. It is the same percentage the fan shows. |
 | Ventilation mode | How the air moves: see [Ventilation modes](#ventilation-modes). |
 | Timer mode | Off, night (quiet) or party (strong) for a while. |
 
