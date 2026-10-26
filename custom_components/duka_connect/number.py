@@ -53,6 +53,12 @@ def _fan_speed(point: Key[int]) -> DukaNumberDescription:
 
 NUMBERS: tuple[DukaNumberDescription, ...] = (
     DukaNumberDescription(
+        key=str(PointKey.MANUAL_SPEED),
+        translation_key=str(PointKey.MANUAL_SPEED),
+        point=PointKey.MANUAL_SPEED,
+        mode=NumberMode.SLIDER,
+    ),
+    DukaNumberDescription(
         key=str(PointKey.HUMIDITY_THRESHOLD),
         translation_key=str(PointKey.HUMIDITY_THRESHOLD),
         point=PointKey.HUMIDITY_THRESHOLD,

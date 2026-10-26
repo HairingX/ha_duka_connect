@@ -153,6 +153,9 @@
       },
       "exhaust_speed_3": {
         "name": "Exhaust speed 3"
+      },
+      "manual_speed": {
+        "name": "Manual speed"
       }
     },
     "select": {
@@ -170,6 +173,15 @@
           "off": "Off",
           "night": "Night",
           "party": "Party"
+        }
+      },
+      "speed": {
+        "name": "Speed",
+        "state": {
+          "low": "Low",
+          "medium": "Medium",
+          "high": "High",
+          "manual": "Manual"
         }
       }
     },
