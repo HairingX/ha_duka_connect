@@ -76,6 +76,9 @@
       },
       "boost": {
         "name": "Boost"
+      },
+      "rtc_battery_low": {
+        "name": "Urbatteri lavt"
       }
     },
     "button": {
@@ -105,6 +108,9 @@
       },
       "boost_off_delay": {
         "name": "Boost-efterløb"
+      },
+      "rtc_battery_low_threshold": {
+        "name": "Grænse for lavt urbatteri"
       }
     },
     "select": {

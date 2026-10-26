@@ -20,6 +20,7 @@ Built on [duka_connect](https://github.com/HairingX/duka_connect).
 | Alarm | None, alarm or warning |
 | Filter replacement | On when the filter needs replacing, with the time left until it does |
 | Clock battery | The voltage of the CR1220 cell that keeps the unit's clock |
+| Clock battery low | On while that voltage is under a limit you set, 2500 mV unless changed; no document says when Duka's app calls the cell flat |
 | Humidity boost, humidity threshold, boost off delay | Settings |
 | Reset filter timer, reset alarms | Buttons |
 | Operating time, firmware, unit type | Diagnostics |
