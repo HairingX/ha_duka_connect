@@ -38,7 +38,7 @@ page if you need them. An entity your unit does not have is not created.
 | Filter | *Problem* when the filter needs changing. |
 | Filter time left | How long until the filter should be changed. |
 | Boost | *Running* while the unit runs extra strong, for example because of high humidity. |
-| Humidity over threshold | *On* while the humidity is over *Humidity threshold*. |
+| High humidity | *Wet* while the humidity is over *Humidity threshold*, *Dry* otherwise. |
 | Fan 1 RPM, Fan 2 RPM | How fast each fan turns. |
 | Time left on timer | Time left of the night or party mode. *Hidden.* |
 | Relay sensor, 0-10 V sensor level, 0-10 V sensor over threshold | An external sensor wired to the unit, if there is one. *Hidden.* |

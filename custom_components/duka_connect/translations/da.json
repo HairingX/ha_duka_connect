@@ -81,7 +81,7 @@
         "name": "Urbatteri"
       },
       "humidity_over_threshold": {
-        "name": "Luftfugtighed over grænse"
+        "name": "Høj luftfugtighed"
       },
       "relay_sensor_active": {
         "name": "Relæsensor"
