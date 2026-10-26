@@ -162,7 +162,7 @@
       "ventilation_mode": {
         "name": "Ventilationstilstand",
         "state": {
-          "ventilation": "Udsugning",
+          "ventilation": "Ventilation (ensrettet)",
           "heat_recovery": "Varmegenvinding",
           "supply": "Indblæsning"
         }

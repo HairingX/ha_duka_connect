@@ -19,7 +19,7 @@ Duka One units with Wi-Fi, such as the Duka One Pro 50 S Wi-Fi and the Duka One 
 |---|---|
 | Fan | On and off, the three preset speeds, and any speed as a percentage (the manual speed) |
 | Speed, manual speed | The fan's speed and manual speed as entities of their own, with their history |
-| Ventilation mode | Extract, heat recovery or supply |
+| Ventilation mode | Ventilation (one-way), heat recovery or supply; see below |
 | Timer mode | Off, night or party; with the night and party durations as settings |
 | Humidity, fan speeds | Measurements; humidity over its threshold as a flag |
 | Alarm | None, alarm or warning, as the unit reports it |
@@ -36,6 +36,16 @@ Duka One units with Wi-Fi, such as the Duka One Pro 50 S Wi-Fi and the Duka One 
 | Operating time, firmware, unit type, IP address | Diagnostics |
 
 A value the unit says it does not have gets no entity.
+
+### Ventilation modes
+
+| Mode | What the unit does |
+|---|---|
+| Ventilation (one-way) | Moves air one way all the time: in or out, as the unit's DIP switch sets it. Duka recommends half of a home's units set each way, so that the ventilation is balanced. |
+| Heat recovery | Alternates, 70 seconds in and 70 seconds out, through its ceramic heat exchanger, which keeps the heat of the air going out. |
+| Supply | Only brings outdoor air in. |
+
+Duka's user manual describes them; Duka's app calls heat recovery "Regeneration".
 
 ## Installation
 

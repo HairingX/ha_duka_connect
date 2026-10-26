@@ -162,7 +162,7 @@
       "ventilation_mode": {
         "name": "Ventilation mode",
         "state": {
-          "ventilation": "Extract",
+          "ventilation": "Ventilation (one-way)",
           "heat_recovery": "Heat recovery",
           "supply": "Supply"
         }

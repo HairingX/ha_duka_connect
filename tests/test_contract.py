@@ -115,6 +115,19 @@ def test_every_state_an_entity_can_take_has_a_name(language: str) -> None:
     assert set(presets) == set(PRESETS), f"{language} fan.fan preset_mode"
 
 
+VENTILATION_MODE_NAMES = {
+    "en": {"ventilation": "Ventilation (one-way)", "heat_recovery": "Heat recovery", "supply": "Supply"},
+    "da": {"ventilation": "Ventilation (ensrettet)", "heat_recovery": "Varmegenvinding", "supply": "Indblæsning"},
+}
+"""Ventilation moves air one way, in or out as the unit's DIP switch sets it; it is not extract."""
+
+
+@pytest.mark.parametrize("language", list(VENTILATION_MODE_NAMES))
+def test_the_ventilation_modes_are_named_for_what_they_do(language: str) -> None:
+    states = _translations(language)["entity"]["select"]["ventilation_mode"]["state"]
+    assert states == VENTILATION_MODE_NAMES[language]
+
+
 def test_every_icon_belongs_to_a_translated_entity() -> None:
     icons = json.loads((INTEGRATION / "icons.json").read_text(encoding="utf-8"))
     names = _translations("en")["entity"]
