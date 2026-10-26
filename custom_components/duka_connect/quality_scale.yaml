@@ -1,0 +1,107 @@
+rules:
+  # Bronze
+  action-setup:
+    status: exempt
+    comment: The integration registers no service actions.
+  appropriate-polling:
+    status: done
+    comment: >-
+      Each point is read at its own rate, and only what an entity follows; a poll with nothing
+      due sends nothing. homeassistant.update_entity reads an entity at once.
+  brands:
+    status: done
+    comment: Duka's own icon and logo, shipped in brand/, which Home Assistant serves for custom integrations.
+  common-modules: done
+  config-flow-test-coverage: done
+  config-flow: done
+  dependency-transparency: done
+  docs-actions:
+    status: exempt
+    comment: The integration registers no service actions.
+  docs-conditions:
+    status: exempt
+    comment: The integration provides no conditions.
+  docs-high-level-description: done
+  docs-installation-instructions: done
+  docs-removal-instructions: done
+  docs-triggers:
+    status: exempt
+    comment: The integration provides no triggers.
+  entity-event-setup: done
+  entity-unique-id: done
+  has-entity-name: done
+  runtime-data: done
+  test-before-configure: done
+  test-before-setup: done
+  unique-config-entry:
+    status: done
+    comment: By the unit's device id.
+
+  # Silver
+  action-exceptions: done
+  config-entry-unloading: done
+  docs-configuration-parameters:
+    status: done
+    comment: The one option, the clock battery's low limit, is described in the README.
+  docs-installation-parameters: done
+  entity-unavailable: done
+  integration-owner: done
+  log-when-unavailable:
+    status: done
+    comment: The integration logs once when the unit stops answering and once when it answers again.
+  parallel-updates: done
+  reauthentication-flow:
+    status: exempt
+    comment: >-
+      A unit does not answer a wrong password, so a refused password cannot be told from a unit
+      that is away; reconfigure changes the password.
+  test-coverage: done
+
+  # Gold
+  devices: done
+  diagnostics: done
+  discovery-update-info:
+    status: exempt
+    comment: There is no discovery by Home Assistant to follow.
+  discovery:
+    status: exempt
+    comment: >-
+      The unit announces nothing of its own: no mDNS, and its DHCP host name and MAC prefix are
+      its Wi-Fi module's, shared with every other device built on it. The setup searches the
+      network on request instead.
+  docs-data-update: done
+  docs-examples:
+    status: todo
+    comment: Not written yet.
+  docs-known-limitations: done
+  docs-supported-devices: done
+  docs-supported-functions: done
+  docs-troubleshooting: done
+  docs-use-cases:
+    status: todo
+    comment: Not written yet.
+  dynamic-devices:
+    status: exempt
+    comment: An entry is one unit, which is one device.
+  entity-category: done
+  entity-device-class: done
+  entity-disabled-by-default: done
+  entity-translations: done
+  exception-translations: done
+  icon-translations: done
+  reconfiguration-flow: done
+  repair-issues:
+    status: exempt
+    comment: Nothing the user must repair has been found yet.
+  stale-devices:
+    status: exempt
+    comment: An entry is one unit, which is one device; it goes with the entry.
+
+  # Platinum
+  async-dependency: done
+  inject-websession:
+    status: exempt
+    comment: The library speaks the unit's UDP protocol, not HTTP.
+  strict-typing:
+    status: done
+    comment: pyright strict reports no errors; the library ships py.typed.

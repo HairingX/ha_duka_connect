@@ -28,4 +28,10 @@ A CR1220 gives 3000 mV new; no document says when Duka's app reports it flat.
 """
 
 BATTERY_LOW_KEY: Final = "rtc_battery_low"
-"""The key of the clock battery low flag and, with `_threshold`, of its limit."""
+"""The key of the clock battery low flag."""
+
+CONF_BATTERY_LOW: Final = "battery_low"
+"""The option holding the millivolts under which the clock battery counts as low."""
+
+SET_CLOCK_KEY: Final = "set_clock"
+"""The key of the button that sets the unit's clock to Home Assistant's."""

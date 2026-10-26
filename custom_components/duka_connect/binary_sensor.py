@@ -1,4 +1,4 @@
-"""Whether the filter needs replacing, whether boost runs, and whether the clock battery is low."""
+"""Flags of the unit: the filter, boost, its sensors' states, and whether the clock battery is low."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from homeassistant.components.binary_sensor import (
 )
 from homeassistant.components.binary_sensor.const import BinarySensorDeviceClass
 from homeassistant.const import EntityCategory
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .const import BATTERY_LOW_KEY
@@ -41,6 +41,24 @@ BINARY_SENSORS: tuple[DukaBinarySensorDescription, ...] = (
         translation_key=str(PointKey.BOOST),
         point=PointKey.BOOST,
         device_class=BinarySensorDeviceClass.RUNNING,
+    ),
+    DukaBinarySensorDescription(
+        key=str(PointKey.HUMIDITY_OVER_THRESHOLD),
+        translation_key=str(PointKey.HUMIDITY_OVER_THRESHOLD),
+        point=PointKey.HUMIDITY_OVER_THRESHOLD,
+        device_class=BinarySensorDeviceClass.MOISTURE,
+    ),
+    DukaBinarySensorDescription(
+        key=str(PointKey.RELAY_SENSOR_ACTIVE),
+        translation_key=str(PointKey.RELAY_SENSOR_ACTIVE),
+        point=PointKey.RELAY_SENSOR_ACTIVE,
+        entity_registry_enabled_default=False,
+    ),
+    DukaBinarySensorDescription(
+        key=str(PointKey.ANALOG_SENSOR_OVER_THRESHOLD),
+        translation_key=str(PointKey.ANALOG_SENSOR_OVER_THRESHOLD),
+        point=PointKey.ANALOG_SENSOR_OVER_THRESHOLD,
+        entity_registry_enabled_default=False,
     ),
 )
 
@@ -72,7 +90,7 @@ class DukaBinarySensor(DukaPointEntity, BinarySensorEntity):
 
 
 class DukaBatteryLow(DukaEntity, BinarySensorEntity):
-    """On while the clock battery's voltage is under the limit the user sets."""
+    """On while the clock battery's voltage is under the limit set in the entry's options."""
 
     _attr_translation_key = BATTERY_LOW_KEY
     _attr_device_class = BinarySensorDeviceClass.BATTERY
@@ -88,13 +106,3 @@ class DukaBatteryLow(DukaEntity, BinarySensorEntity):
     def _show(self) -> None:
         voltage = self._current(PointKey.RTC_BATTERY_VOLTAGE)
         self._attr_is_on = None if voltage is None else voltage < self._data.battery_low
-
-    async def async_added_to_hass(self) -> None:
-        """Follow the voltage, whether the unit answers, and the limit."""
-        self._data.battery_low_listeners.append(self._limit_changed)
-        self.async_on_remove(lambda: self._data.battery_low_listeners.remove(self._limit_changed))
-        await super().async_added_to_hass()
-
-    @callback
-    def _limit_changed(self) -> None:
-        self._changed()

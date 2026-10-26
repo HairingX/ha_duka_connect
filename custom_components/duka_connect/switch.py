@@ -1,4 +1,4 @@
-"""Settings that are on or off: whether humidity may start boost."""
+"""Settings of the unit that are on or off."""
 
 from __future__ import annotations
 
@@ -24,13 +24,22 @@ class DukaSwitchDescription(DukaEntityDescription, SwitchEntityDescription):
     point: Key[bool]
 
 
-SWITCHES: tuple[DukaSwitchDescription, ...] = (
-    DukaSwitchDescription(
-        key=str(PointKey.HUMIDITY_SENSOR_ENABLED),
-        translation_key=str(PointKey.HUMIDITY_SENSOR_ENABLED),
-        point=PointKey.HUMIDITY_SENSOR_ENABLED,
+def _switch(point: Key[bool], *, enabled: bool = True) -> DukaSwitchDescription:
+    return DukaSwitchDescription(
+        key=str(point),
+        translation_key=str(point),
+        point=point,
         entity_category=EntityCategory.CONFIG,
-    ),
+        entity_registry_enabled_default=enabled,
+    )
+
+
+SWITCHES: tuple[DukaSwitchDescription, ...] = (
+    _switch(PointKey.HUMIDITY_SENSOR_ENABLED),
+    _switch(PointKey.WEEKLY_SCHEDULE),
+    _switch(PointKey.CLOUD_ENABLED),
+    _switch(PointKey.RELAY_SENSOR_ENABLED, enabled=False),
+    _switch(PointKey.ANALOG_SENSOR_ENABLED, enabled=False),
 )
 
 

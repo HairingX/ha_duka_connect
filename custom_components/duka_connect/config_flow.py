@@ -14,11 +14,17 @@ from duka_connect import (
     UnsupportedDeviceError,
     discover,
 )
-from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
+from homeassistant.config_entries import (
+    ConfigEntry,
+    ConfigFlow,
+    ConfigFlowResult,
+    OptionsFlowWithReload,
+)
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PASSWORD
+from homeassistant.core import callback
 
 from . import const
-from .const import CONF_DEVICE_ID, DEFAULT_NAME, DOMAIN
+from .const import BATTERY_LOW_DEFAULT, CONF_BATTERY_LOW, CONF_DEVICE_ID, DEFAULT_NAME, DOMAIN
 from .data import new_client
 
 _LOGGER = logging.getLogger(__name__)
@@ -105,6 +111,12 @@ class DukaConfigFlow(ConfigFlow, domain=DOMAIN):
     """
 
     VERSION = 1
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: ConfigEntry) -> DukaOptionsFlow:
+        """Change the entry's options."""
+        return DukaOptionsFlow()
 
     def __init__(self) -> None:
         """Start with nothing found."""
@@ -206,3 +218,23 @@ class DukaConfigFlow(ConfigFlow, domain=DOMAIN):
             CONF_PASSWORD: password,
         }
         return settings, await _check(host, device_id, password)
+
+
+class DukaOptionsFlow(OptionsFlowWithReload):
+    """Set the voltage under which the clock battery counts as low."""
+
+    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        """Ask for the limit, in millivolts."""
+        if user_input is not None:
+            return self.async_create_entry(data=user_input)
+        current = int(self.config_entry.options.get(CONF_BATTERY_LOW, BATTERY_LOW_DEFAULT))
+        return self.async_show_form(
+            step_id="init",
+            data_schema=probatio.Schema(
+                {
+                    probatio.Required(CONF_BATTERY_LOW, default=current): probatio.All(
+                        probatio.Coerce(int), probatio.Range(min=2000, max=3300)
+                    )
+                }
+            ),
+        )

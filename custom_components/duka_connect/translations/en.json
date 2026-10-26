@@ -79,6 +79,15 @@
       },
       "rtc_battery_low": {
         "name": "Clock battery low"
+      },
+      "humidity_over_threshold": {
+        "name": "Humidity over threshold"
+      },
+      "relay_sensor_active": {
+        "name": "Relay sensor"
+      },
+      "analog_sensor_over_threshold": {
+        "name": "0-10 V sensor over threshold"
       }
     },
     "button": {
@@ -87,6 +96,12 @@
       },
       "reset_alarms": {
         "name": "Reset alarms"
+      },
+      "restore_fan_speeds": {
+        "name": "Restore fan speeds"
+      },
+      "set_clock": {
+        "name": "Set clock"
       }
     },
     "fan": {
@@ -109,8 +124,35 @@
       "boost_off_delay": {
         "name": "Boost off delay"
       },
-      "rtc_battery_low_threshold": {
-        "name": "Clock battery low limit"
+      "night_timer": {
+        "name": "Night mode duration"
+      },
+      "party_timer": {
+        "name": "Party mode duration"
+      },
+      "filter_interval": {
+        "name": "Filter change interval"
+      },
+      "analog_sensor_threshold": {
+        "name": "0-10 V sensor threshold"
+      },
+      "supply_speed_1": {
+        "name": "Supply speed 1"
+      },
+      "exhaust_speed_1": {
+        "name": "Exhaust speed 1"
+      },
+      "supply_speed_2": {
+        "name": "Supply speed 2"
+      },
+      "exhaust_speed_2": {
+        "name": "Exhaust speed 2"
+      },
+      "supply_speed_3": {
+        "name": "Supply speed 3"
+      },
+      "exhaust_speed_3": {
+        "name": "Exhaust speed 3"
       }
     },
     "select": {
@@ -166,11 +208,32 @@
       },
       "unit_type": {
         "name": "Unit type"
+      },
+      "fan2_rpm": {
+        "name": "Fan 2 speed"
+      },
+      "analog_sensor_level": {
+        "name": "0-10 V sensor"
+      },
+      "ip_address": {
+        "name": "IP address"
       }
     },
     "switch": {
       "humidity_sensor_enabled": {
         "name": "Humidity boost"
+      },
+      "weekly_schedule": {
+        "name": "Weekly schedule"
+      },
+      "cloud_enabled": {
+        "name": "Cloud access"
+      },
+      "relay_sensor_enabled": {
+        "name": "Relay sensor boost"
+      },
+      "analog_sensor_enabled": {
+        "name": "0-10 V sensor boost"
       }
     }
   },
@@ -186,6 +249,19 @@
     },
     "no_answer": {
       "message": "The unit did not answer."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "description": "The unit has no such setting; Home Assistant uses it for the clock battery low flag.",
+        "data": {
+          "battery_low": "Clock battery low under (mV)"
+        },
+        "data_description": {
+          "battery_low": "A new CR1220 gives about 3000 mV; no document says when Duka's app calls it flat."
+        }
+      }
     }
   }
 }

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import pytest
 from duka_connect.testing import SimulatedDuka
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import HomeAssistant
@@ -11,7 +12,7 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 from custom_components.duka_connect.const import DOMAIN
 from custom_components.duka_connect.data import DukaData
 
-from .conftest import DEVICE_ID, entry_data
+from .conftest import DEVICE_ID, FakeClock, entry_data
 
 
 async def set_up(hass: HomeAssistant, entry: MockConfigEntry) -> None:
@@ -67,3 +68,21 @@ async def test_the_entities_of_a_point_the_unit_lost_are_removed(
     assert registry.async_get_entity_id("sensor", DOMAIN, "Duka One_rtc_battery_voltage") is None
     await hass.config_entries.async_unload(config_entry.entry_id)
     await hass.async_block_till_done()
+
+
+async def test_a_unit_that_stops_answering_is_logged_once_and_again_when_it_answers(
+    hass: HomeAssistant,
+    loaded: DukaData,
+    unit: SimulatedDuka,
+    clock: FakeClock,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    unit.answering = False
+    for _ in range(2):
+        clock.advance(30)
+        await loaded.client.poll()
+    unit.answering = True
+    clock.advance(30)
+    await loaded.client.poll()
+    messages = [r.getMessage() for r in caplog.records if r.name == "custom_components.duka_connect"]
+    assert messages == ["Duka One does not answer", "Duka One answers again"]

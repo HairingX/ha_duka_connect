@@ -98,6 +98,22 @@ SENSORS: tuple[DukaSensorDescription, ...] = (
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
     ),
+    _sensor(
+        PointKey.FAN2_RPM,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=REVOLUTIONS_PER_MINUTE,
+    ),
+    _sensor(
+        PointKey.ANALOG_SENSOR_LEVEL,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=PERCENTAGE,
+        entity_registry_enabled_default=False,
+    ),
+    _sensor(
+        PointKey.IP_ADDRESS,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+    ),
 )
 
 
