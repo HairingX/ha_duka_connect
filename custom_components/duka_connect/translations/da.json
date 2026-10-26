@@ -72,13 +72,13 @@
   "entity": {
     "binary_sensor": {
       "filter_replace": {
-        "name": "Filterskift"
+        "name": "Filter"
       },
       "boost": {
         "name": "Boost"
       },
       "rtc_battery_low": {
-        "name": "Urbatteri lavt"
+        "name": "Urbatteri"
       },
       "humidity_over_threshold": {
         "name": "Luftfugtighed over grænse"
@@ -162,7 +162,7 @@
       "ventilation_mode": {
         "name": "Ventilationstilstand",
         "state": {
-          "ventilation": "Udsugning",
+          "ventilation": "Ventilation (ensrettet)",
           "heat_recovery": "Varmegenvinding",
           "supply": "Indblæsning"
         }
@@ -190,10 +190,10 @@
         "name": "Luftfugtighed"
       },
       "fan_rpm": {
-        "name": "Ventilatorhastighed"
+        "name": "Ventilator 1 omdrejninger"
       },
       "rtc_battery_voltage": {
-        "name": "Urbatteri"
+        "name": "Urbatteriets spænding"
       },
       "filter_timer": {
         "name": "Tid til filterskift"
@@ -222,10 +222,10 @@
         "name": "Enhedstype"
       },
       "fan2_rpm": {
-        "name": "Ventilator 2 hastighed"
+        "name": "Ventilator 2 omdrejninger"
       },
       "analog_sensor_level": {
-        "name": "0-10 V-sensor"
+        "name": "Niveau fra 0-10 V-sensor"
       },
       "ip_address": {
         "name": "IP-adresse"
@@ -266,7 +266,7 @@
   "options": {
     "step": {
       "init": {
-        "description": "Enheden har ingen sådan indstilling; Home Assistant bruger den til alarmen for lavt urbatteri.",
+        "description": "Enheden har ingen sådan indstilling; Home Assistant bruger den til urbatteriets tilstand Lav.",
         "data": {
           "battery_low": "Urbatteri lavt under (mV)"
         },

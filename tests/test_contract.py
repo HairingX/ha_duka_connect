@@ -115,6 +115,34 @@ def test_every_state_an_entity_can_take_has_a_name(language: str) -> None:
     assert set(presets) == set(PRESETS), f"{language} fan.fan preset_mode"
 
 
+VENTILATION_MODE_NAMES = {
+    "en": {"ventilation": "Ventilation (one-way)", "heat_recovery": "Heat recovery", "supply": "Supply"},
+    "da": {"ventilation": "Ventilation (ensrettet)", "heat_recovery": "Varmegenvinding", "supply": "Indblæsning"},
+}
+"""Ventilation moves air one way, in or out as the unit's DIP switch sets it; it is not extract."""
+
+
+@pytest.mark.parametrize("language", list(VENTILATION_MODE_NAMES))
+def test_the_ventilation_modes_are_named_for_what_they_do(language: str) -> None:
+    states = _translations(language)["entity"]["select"]["ventilation_mode"]["state"]
+    assert states == VENTILATION_MODE_NAMES[language]
+
+
+STATE_WORDS = {
+    "en": ("low", "replacement", "problem", "running", "active", "on", "off"),
+    "da": ("lav", "lavt", "skift", "problem", "kører", "aktiv", "til", "fra"),
+}
+"""Words a binary sensor's state shows, which its name must not repeat."""
+
+
+@pytest.mark.parametrize("language", list(STATE_WORDS))
+def test_no_binary_sensor_name_repeats_what_its_state_shows(language: str) -> None:
+    names = _translations(language)["entity"]["binary_sensor"]
+    for key, entry in names.items():
+        words = entry["name"].lower().split()
+        assert not set(words) & set(STATE_WORDS[language]), f"{language} {key}: {entry['name']}"
+
+
 def test_every_icon_belongs_to_a_translated_entity() -> None:
     icons = json.loads((INTEGRATION / "icons.json").read_text(encoding="utf-8"))
     names = _translations("en")["entity"]
