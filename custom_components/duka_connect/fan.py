@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import math
 from typing import Any
 
 from duka_connect import Key, PointKey, Speed
@@ -10,20 +9,16 @@ from homeassistant.components.fan import FanEntity
 from homeassistant.components.fan.const import FanEntityFeature
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
-from homeassistant.util.percentage import (
-    percentage_to_ranged_value,
-    ranged_value_to_percentage,
-)
 
 from .data import DukaConfigEntry, DukaData
 from .entity import DukaEntity
+from .speed import manual_to_percentage, percentage_to_manual
 
 PARALLEL_UPDATES = 0
 
 PRESETS: dict[str, Speed] = {"low": Speed.LOW, "medium": Speed.MEDIUM, "high": Speed.HIGH}
 """The unit's preset speeds, by preset mode; any other speed is the manual one."""
 
-_MANUAL_RANGE = (1, 255)
 _PRESET_PERCENTAGE: dict[Speed, int] = {Speed.LOW: 33, Speed.MEDIUM: 67, Speed.HIGH: 100}
 
 
@@ -77,7 +72,7 @@ class DukaFan(DukaEntity, FanEntity):
         elif speed is Speed.MANUAL:
             self._attr_percentage = (
                 None if manual is None
-                else ranged_value_to_percentage(_MANUAL_RANGE, max(manual, 1))
+                else manual_to_percentage(max(manual, 1))
             )
         else:
             self._attr_percentage = None if speed is None else _PRESET_PERCENTAGE[speed]
@@ -115,6 +110,6 @@ class DukaFan(DukaEntity, FanEntity):
         if preset_mode is not None:
             return [(PointKey.SPEED, PRESETS[preset_mode])]
         if percentage is not None and percentage > 0:
-            manual = math.ceil(percentage_to_ranged_value(_MANUAL_RANGE, percentage))
+            manual = percentage_to_manual(percentage)
             return [(PointKey.SPEED, Speed.MANUAL), (PointKey.MANUAL_SPEED, manual)]
         return []

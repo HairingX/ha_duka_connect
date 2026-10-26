@@ -17,15 +17,17 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .data import DukaConfigEntry, DukaData
 from .entity import DukaEntityDescription, DukaPointEntity, describe
+from .speed import manual_to_percentage, percentage_to_manual
 
 PARALLEL_UPDATES = 0
 
 
 @dataclass(frozen=True, kw_only=True)
 class DukaNumberDescription(DukaEntityDescription, NumberEntityDescription):
-    """A number of one setting; its limits are the point's."""
+    """A number of one setting; its limits are the point's, or 0 to 100 % for a manual speed."""
 
     point: Key[int]
+    percentage: bool = False
 
 
 def _duration(point: Key[int], unit: UnitOfTime) -> DukaNumberDescription:
@@ -56,6 +58,8 @@ NUMBERS: tuple[DukaNumberDescription, ...] = (
         key=str(PointKey.MANUAL_SPEED),
         translation_key=str(PointKey.MANUAL_SPEED),
         point=PointKey.MANUAL_SPEED,
+        percentage=True,
+        native_unit_of_measurement=PERCENTAGE,
         mode=NumberMode.SLIDER,
     ),
     DukaNumberDescription(
@@ -114,17 +118,21 @@ class DukaNumber(DukaPointEntity, NumberEntity):
 
     def __init__(self, data: DukaData, description: DukaNumberDescription) -> None:
         self._setting = description.point
+        self._percentage = description.percentage
         point = data.client.points[str(description.point)]
-        self._attr_native_min_value = float(point.minimum or 0)
-        self._attr_native_max_value = float(point.maximum or 255)
+        self._attr_native_min_value = 0.0 if self._percentage else float(point.minimum or 0)
+        self._attr_native_max_value = 100.0 if self._percentage else float(point.maximum or 255)
         self._attr_native_step = 1
         super().__init__(data, description)
 
     def _show(self) -> None:
         current = self._current(self._setting)
-        self._attr_native_value = None if current is None else float(current)
+        shown = manual_to_percentage(current) if self._percentage and current is not None else current
+        self._attr_native_value = None if shown is None else float(shown)
 
     async def async_set_native_value(self, value: float) -> None:
         """Write the setting."""
-        await self._write([(self._setting, round(value))])
+        await self._write(
+            [(self._setting, percentage_to_manual(value) if self._percentage else round(value))]
+        )
 
