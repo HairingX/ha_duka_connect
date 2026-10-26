@@ -5,11 +5,15 @@ from __future__ import annotations
 from duka_connect import Speed, VentilationMode
 from duka_connect.testing import SimulatedDuka
 from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, State
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import entity_registry as er
 
 import pytest
+from pytest_homeassistant_custom_component.common import (
+    MockConfigEntry,
+    mock_restore_cache_with_extra_data,
+)
 
 from custom_components.duka_connect.const import DOMAIN
 from custom_components.duka_connect.data import DukaData
@@ -40,7 +44,7 @@ async def test_the_unit_has_every_entity(hass: HomeAssistant, loaded: DukaData) 
             "operating_time", "alarm", "firmware_version", "firmware_date", "unit_type",
             "filter_replace", "boost", "reset_filter_timer", "reset_alarms",
             "humidity_sensor_enabled", "humidity_threshold", "boost_off_delay",
-            "ventilation_mode", "timer_mode",
+            "ventilation_mode", "timer_mode", "rtc_battery_low", "rtc_battery_low_threshold",
         )
     )
 
@@ -198,3 +202,60 @@ async def test_a_number_within_its_limits_is_written(
         blocking=True,
     )
     assert unit.values[0x19] == bytes([70])
+
+
+async def test_the_clock_battery_is_low_under_the_limit(
+    hass: HomeAssistant, loaded: DukaData, unit: SimulatedDuka
+) -> None:
+    assert state(hass, "binary_sensor", "rtc_battery_low") == STATE_OFF
+    unit.values[0x24] = (2400).to_bytes(2, "little")
+    await loaded.client.refresh()
+    await hass.async_block_till_done()
+    assert state(hass, "binary_sensor", "rtc_battery_low") == STATE_ON
+
+
+async def test_the_clock_battery_low_limit_is_the_users(
+    hass: HomeAssistant, loaded: DukaData
+) -> None:
+    assert state(hass, "number", "rtc_battery_low_threshold") == "2500.0"
+    await hass.services.async_call(
+        "number", "set_value",
+        {"entity_id": entity_id(hass, "number", "rtc_battery_low_threshold"), "value": 3100},
+        blocking=True,
+    )
+    assert loaded.battery_low == 3100
+    assert state(hass, "binary_sensor", "rtc_battery_low") == STATE_ON
+
+
+async def test_a_unit_without_a_clock_battery_voltage_has_no_battery_low_entities(
+    hass: HomeAssistant, config_entry: MockConfigEntry, unit: SimulatedDuka
+) -> None:
+    unit.unsupported.add(0x24)
+    config_entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+    registry = er.async_get(hass)
+    for platform, key in (("binary_sensor", "rtc_battery_low"), ("number", "rtc_battery_low_threshold")):
+        assert registry.async_get_entity_id(platform, DOMAIN, f"{NAME}_{key}") is None
+    await hass.config_entries.async_unload(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+
+async def test_the_clock_battery_low_limit_survives_a_restart(
+    hass: HomeAssistant, config_entry: MockConfigEntry
+) -> None:
+    mock_restore_cache_with_extra_data(
+        hass,
+        [(
+            State("number.duka_one_clock_battery_low_limit", "2800"),
+            {"native_value": 2800.0, "native_min_value": 2000.0, "native_max_value": 3300.0,
+             "native_step": 50.0, "native_unit_of_measurement": "mV"},
+        )],
+    )
+    config_entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+    data: DukaData = config_entry.runtime_data
+    assert data.battery_low == 2800
+    await hass.config_entries.async_unload(config_entry.entry_id)
+    await hass.async_block_till_done()

@@ -76,6 +76,9 @@
       },
       "boost": {
         "name": "Boost"
+      },
+      "rtc_battery_low": {
+        "name": "Clock battery low"
       }
     },
     "button": {
@@ -105,6 +108,9 @@
       },
       "boost_off_delay": {
         "name": "Boost off delay"
+      },
+      "rtc_battery_low_threshold": {
+        "name": "Clock battery low limit"
       }
     },
     "select": {

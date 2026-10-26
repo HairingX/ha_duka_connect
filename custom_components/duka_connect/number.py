@@ -1,4 +1,5 @@
-"""Settings that are numbers: the humidity that starts boost, and how long boost runs on."""
+"""Settings that are numbers: the humidity that starts boost, how long boost runs on, and the
+voltage under which the clock battery counts as low."""
 
 from __future__ import annotations
 
@@ -10,13 +11,15 @@ from homeassistant.components.number import (
     NumberEntity,
     NumberEntityDescription,
     NumberMode,
+    RestoreNumber,
 )
-from homeassistant.const import PERCENTAGE, EntityCategory, UnitOfTime
+from homeassistant.const import PERCENTAGE, EntityCategory, UnitOfElectricPotential, UnitOfTime
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
+from .const import BATTERY_LOW_KEY
 from .data import DukaConfigEntry, DukaData
-from .entity import DukaEntityDescription, DukaPointEntity, describe
+from .entity import DukaEntityDescription, DukaPointEntity, describe, device_info, shown
 
 PARALLEL_UPDATES = 0
 
@@ -57,7 +60,10 @@ async def async_setup_entry(
 ) -> None:
     """Add a number for every described setting the unit has."""
     data = entry.runtime_data
-    async_add_entities(DukaNumber(data, d) for d in describe(data, NUMBERS))
+    entities: list[NumberEntity] = [DukaNumber(data, d) for d in describe(data, NUMBERS)]
+    if shown(data, PointKey.RTC_BATTERY_VOLTAGE):
+        entities.append(DukaBatteryLowThreshold(data))
+    async_add_entities(entities)
 
 
 class DukaNumber(DukaPointEntity, NumberEntity):
@@ -78,3 +84,41 @@ class DukaNumber(DukaPointEntity, NumberEntity):
     async def async_set_native_value(self, value: float) -> None:
         """Write the setting."""
         await self._write([(self._setting, round(value))])
+
+
+class DukaBatteryLowThreshold(RestoreNumber):
+    """The voltage under which the clock battery counts as low; kept by Home Assistant.
+
+    The unit has no such setting, so the value lives in Home Assistant and survives a restart.
+    """
+
+    _attr_has_entity_name = True
+    _attr_should_poll = False
+    _attr_translation_key = f"{BATTERY_LOW_KEY}_threshold"
+    _attr_device_class = NumberDeviceClass.VOLTAGE
+    _attr_native_unit_of_measurement = UnitOfElectricPotential.MILLIVOLT
+    _attr_native_min_value = 2000
+    _attr_native_max_value = 3300
+    _attr_native_step = 50
+    _attr_mode = NumberMode.BOX
+    _attr_entity_category = EntityCategory.CONFIG
+
+    def __init__(self, data: DukaData) -> None:
+        self._data = data
+        self._attr_unique_id = f"{data.name}_{BATTERY_LOW_KEY}_threshold"
+        self._attr_device_info = device_info(data)
+        self._attr_native_value = float(data.battery_low)
+        data.unique_ids.add(self._attr_unique_id)
+
+    async def async_added_to_hass(self) -> None:
+        """Take the limit Home Assistant kept, if there is one."""
+        await super().async_added_to_hass()
+        last = await self.async_get_last_number_data()
+        if last is not None and last.native_value is not None:
+            await self.async_set_native_value(last.native_value)
+
+    async def async_set_native_value(self, value: float) -> None:
+        """Set the limit."""
+        self._attr_native_value = value
+        self._data.set_battery_low(round(value))
+        self.async_write_ha_state()
