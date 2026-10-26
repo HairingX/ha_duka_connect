@@ -328,9 +328,9 @@ async def test_the_device_carries_the_firmware_and_unit_type(
     )
 
 
-async def test_humidity_over_threshold_has_no_device_class(
-    hass: HomeAssistant, loaded: DukaData
-) -> None:
-    """The moisture class means wet, as from a leak, and would show "Wet"."""
+async def test_high_humidity_is_a_moisture_sensor(hass: HomeAssistant, loaded: DukaData) -> None:
+    """Humid air is moisture; the flag shows Wet and Dry, as a Nilan unit's does."""
     current = hass.states.get(entity_id(hass, "binary_sensor", "humidity_over_threshold"))
-    assert current is not None and "device_class" not in current.attributes
+    assert current is not None
+    assert current.attributes["device_class"] == "moisture"
+    assert current.attributes["friendly_name"] == "Duka One High humidity"

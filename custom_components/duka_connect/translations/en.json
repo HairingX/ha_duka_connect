@@ -81,7 +81,7 @@
         "name": "Clock battery"
       },
       "humidity_over_threshold": {
-        "name": "Humidity over threshold"
+        "name": "High humidity"
       },
       "relay_sensor_active": {
         "name": "Relay sensor"
