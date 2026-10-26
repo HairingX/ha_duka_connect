@@ -62,10 +62,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: DukaConfigEntry) -> bool
         raise
 
     entry.async_on_unload(_log_when_unavailable(client, name))
-    # Polling starts once the entities have subscribed: the client reads what is wanted.
-    entry.runtime_data.poller = entry.async_create_background_task(
-        hass, _poll(client), f"{DOMAIN} poll {entry.title}"
-    )
+    # With polling disabled in the entry's system options, only what is asked for is read:
+    # homeassistant.update_entity, and the read-back of a write. Changing it reloads the entry.
+    if not entry.pref_disable_polling:
+        # Polling starts once the entities have subscribed: the client reads what is wanted.
+        entry.runtime_data.poller = entry.async_create_background_task(
+            hass, _poll(client), f"{DOMAIN} poll {entry.title}"
+        )
     return True
 
 

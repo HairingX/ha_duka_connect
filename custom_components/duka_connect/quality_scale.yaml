@@ -7,7 +7,8 @@ rules:
     status: done
     comment: >-
       Each point is read at its own rate, and only what an entity follows; a poll with nothing
-      due sends nothing. homeassistant.update_entity reads an entity at once.
+      due sends nothing. homeassistant.update_entity reads an entity at once, and polling
+      disabled in the entry's system options starts no polling.
   brands:
     status: done
     comment: Duka's own icon and logo, shipped in brand/, which Home Assistant serves for custom integrations.
