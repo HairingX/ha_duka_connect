@@ -46,7 +46,6 @@ BINARY_SENSORS: tuple[DukaBinarySensorDescription, ...] = (
         key=str(PointKey.HUMIDITY_OVER_THRESHOLD),
         translation_key=str(PointKey.HUMIDITY_OVER_THRESHOLD),
         point=PointKey.HUMIDITY_OVER_THRESHOLD,
-        device_class=BinarySensorDeviceClass.MOISTURE,
     ),
     DukaBinarySensorDescription(
         key=str(PointKey.RELAY_SENSOR_ACTIVE),

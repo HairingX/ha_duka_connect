@@ -7,6 +7,7 @@ from duka_connect.testing import SimulatedDuka
 from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ServiceValidationError
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 
 import pytest
@@ -315,3 +316,21 @@ async def test_the_manual_speed_has_its_own_entity(
         blocking=True,
     )
     assert unit.values[0x44] == bytes([200])
+
+
+async def test_the_device_carries_the_firmware_and_unit_type(
+    hass: HomeAssistant, config_entry: MockConfigEntry, loaded: DukaData
+) -> None:
+    device = dr.async_get(hass).async_get_device_by_identifier((DOMAIN, NAME), config_entry.entry_id)
+    assert device is not None
+    assert (device.manufacturer, device.model, device.sw_version, device.model_id) == (
+        "Duka", "Duka One", "1.5", "3"
+    )
+
+
+async def test_humidity_over_threshold_has_no_device_class(
+    hass: HomeAssistant, loaded: DukaData
+) -> None:
+    """The moisture class means wet, as from a leak, and would show "Wet"."""
+    current = hass.states.get(entity_id(hass, "binary_sensor", "humidity_over_threshold"))
+    assert current is not None and "device_class" not in current.attributes

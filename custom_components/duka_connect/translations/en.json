@@ -72,13 +72,13 @@
   "entity": {
     "binary_sensor": {
       "filter_replace": {
-        "name": "Filter replacement"
+        "name": "Filter"
       },
       "boost": {
         "name": "Boost"
       },
       "rtc_battery_low": {
-        "name": "Clock battery low"
+        "name": "Clock battery"
       },
       "humidity_over_threshold": {
         "name": "Humidity over threshold"
@@ -190,16 +190,16 @@
         "name": "Humidity"
       },
       "fan_rpm": {
-        "name": "Fan speed"
+        "name": "Fan 1 RPM"
       },
       "rtc_battery_voltage": {
-        "name": "Clock battery"
+        "name": "Clock battery voltage"
       },
       "filter_timer": {
         "name": "Filter time left"
       },
       "timer_countdown": {
-        "name": "Timer left"
+        "name": "Time left on timer"
       },
       "operating_time": {
         "name": "Operating time"
@@ -222,10 +222,10 @@
         "name": "Unit type"
       },
       "fan2_rpm": {
-        "name": "Fan 2 speed"
+        "name": "Fan 2 RPM"
       },
       "analog_sensor_level": {
-        "name": "0-10 V sensor"
+        "name": "0-10 V sensor level"
       },
       "ip_address": {
         "name": "IP address"
@@ -266,7 +266,7 @@
   "options": {
     "step": {
       "init": {
-        "description": "The unit has no such setting; Home Assistant uses it for the clock battery low flag.",
+        "description": "The unit has no such setting; Home Assistant uses it for the clock battery's Low state.",
         "data": {
           "battery_low": "Clock battery low under (mV)"
         },

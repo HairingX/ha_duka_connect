@@ -128,6 +128,21 @@ def test_the_ventilation_modes_are_named_for_what_they_do(language: str) -> None
     assert states == VENTILATION_MODE_NAMES[language]
 
 
+STATE_WORDS = {
+    "en": ("low", "replacement", "problem", "running", "active", "on", "off"),
+    "da": ("lav", "lavt", "skift", "problem", "kører", "aktiv", "til", "fra"),
+}
+"""Words a binary sensor's state shows, which its name must not repeat."""
+
+
+@pytest.mark.parametrize("language", list(STATE_WORDS))
+def test_no_binary_sensor_name_repeats_what_its_state_shows(language: str) -> None:
+    names = _translations(language)["entity"]["binary_sensor"]
+    for key, entry in names.items():
+        words = entry["name"].lower().split()
+        assert not set(words) & set(STATE_WORDS[language]), f"{language} {key}: {entry['name']}"
+
+
 def test_every_icon_belongs_to_a_translated_entity() -> None:
     icons = json.loads((INTEGRATION / "icons.json").read_text(encoding="utf-8"))
     names = _translations("en")["entity"]

@@ -1,13 +1,13 @@
 # Duka Connect
 
-A Home Assistant integration for **Duka One** ventilation units, over the unit's own UDP protocol
-on your local network. No cloud.
+Control and follow your **Duka One** ventilation units from Home Assistant. It talks to the units
+directly on your home network; no Duka account or cloud is needed.
 
 Built on [duka_connect](https://github.com/HairingX/duka_connect).
 
-> **Not yet tested on a unit.** Every value is taken from the manufacturer's connection guide for
-> the protocol; none has been read on a Duka One by this integration yet. Reports of what your
-> unit shows are welcome - the diagnostics download has what is needed.
+> **Early version, not yet tested on a real unit.** Everything is built from the manufacturer's
+> documentation. If something looks wrong, please open an issue and attach the diagnostics file
+> (see [Troubleshooting](#troubleshooting)).
 
 ## Supported devices
 
@@ -15,109 +15,148 @@ Duka One units with Wi-Fi, such as the Duka One Pro 50 S Wi-Fi and the Duka One 
 
 ## What you get
 
+The unit appears as one device. Its entities, by the names Home Assistant shows:
+
+**Run the unit**
+
+| Entity | What it does |
+|---|---|
+| *(the device's name)* | The fan: turn the unit on and off, and set its speed. |
+| Speed | Low, medium, high, or manual. Keeps a history of the speed the unit ran at. |
+| Manual speed | The speed used when *Speed* is manual, 0 to 255. |
+| Ventilation mode | How the air moves; see [Ventilation modes](#ventilation-modes). |
+| Timer mode | Off, night (quiet) or party (boost) for a while. |
+
+**See what the unit does**
+
+| Entity | What it shows |
+|---|---|
+| Humidity | The room's humidity, in %. |
+| Fan 1 RPM, Fan 2 RPM | How fast each fan actually turns. |
+| Boost | On while the unit runs at boost, such as for high humidity. |
+| Humidity over threshold | On while the humidity is over *Humidity threshold*. |
+| Filter time left | Days until the filter should be changed. |
+| Time left on timer | Time left of the night or party mode. |
+
+**Warnings**
+
+| Entity | What it shows |
+|---|---|
+| Filter | Shows *Problem* when the filter needs changing. Press *Reset filter timer* after changing it. |
+| Alarm | Shows none, warning or alarm, as the unit reports it. Press *Reset alarms* to clear it. |
+| Clock battery | Shows *Low* when the unit's clock battery, a CR1220 coin cell, is running flat. *Clock battery voltage* shows its voltage. |
+
+**Settings**
+
+| Entity | What it sets |
+|---|---|
+| Humidity boost | Whether high humidity starts boost. |
+| Humidity threshold | The humidity that starts boost, 40 to 80 %. |
+| Boost off delay | How long boost runs on after the humidity has fallen, in minutes. |
+| Night mode duration, Party mode duration | How long each timer mode runs. |
+| Weekly schedule | Whether the unit follows the weekly schedule set in Duka's app. |
+| Cloud access | Whether Duka's app may reach the unit through Duka's cloud: from away, or from a phone on another network (VLAN) than the unit. Turn it off to keep the app out of the unit's settings, and on when you want to use the app. Whether the unit also refuses the app on its own network when it is off is not yet known. |
+
+**Buttons**
+
+| Entity | What it does |
+|---|---|
+| Reset filter timer | Starts the filter countdown again, after a filter change. |
+| Reset alarms | Clears the unit's alarms. |
+| Set clock | Sets the unit's clock to Home Assistant's time. The weekly schedule runs by this clock. |
+
+**Turned off until you turn them on** (Settings > Devices & services > the device > entities):
+
 | Entity | What it is |
 |---|---|
-| Fan | On and off, the three preset speeds, and any speed as a percentage (the manual speed) |
-| Speed, manual speed | The fan's speed and manual speed as entities of their own, with their history |
-| Ventilation mode | Ventilation (one-way), heat recovery or supply; see below |
-| Timer mode | Off, night or party; with the night and party durations as settings |
-| Humidity, fan speeds | Measurements; humidity over its threshold as a flag |
-| Alarm | None, alarm or warning, as the unit reports it |
-| Filter replacement | On when the filter needs replacing, with the time left until it does |
-| Clock battery | The voltage of the CR1220 cell that keeps the unit's clock |
-| Clock battery low | On while that voltage is under the limit set in the options |
-| Weekly schedule, cloud access | Switches |
-| Humidity boost, humidity threshold, boost off delay | Settings |
-| Set clock | Sets the unit's clock to Home Assistant's local time; its weekly schedule runs by it |
-| Reset filter timer, reset alarms | Buttons |
-| Relay and 0-10 V sensors | Their switches, states and threshold; disabled until enabled |
-| Supply and exhaust speed per preset, restore fan speeds | Only on units that have them; disabled until enabled |
-| Filter change interval | Only on units that have it |
-| Operating time, firmware, unit type, IP address | Diagnostics |
+| Relay sensor, Relay sensor boost | An external switch wired to the unit, and whether it starts boost. |
+| 0-10 V sensor level, 0-10 V sensor boost, 0-10 V sensor threshold, 0-10 V sensor over threshold | An external 0-10 V sensor wired to the unit, such as a CO2 sensor. |
+| Supply speed 1-3, Exhaust speed 1-3, Restore fan speeds | Separate in and out speeds for each preset speed, on units that have them. |
+| Firmware date, Unit type, IP address | Details for troubleshooting. |
 
-A value the unit says it does not have gets no entity.
+**Shown only on units that have them:** Filter change interval (days between filter changes).
+
+**Details for troubleshooting:** Operating time, Firmware version, Clock battery voltage. The firmware and unit type are also shown on the device's page.
+
+An entity the unit does not have is not created. The Danish names are shown when Home Assistant is set to Danish.
 
 ### Ventilation modes
 
 | Mode | What the unit does |
 |---|---|
-| Ventilation (one-way) | Moves air one way all the time: in or out, as the unit's DIP switch sets it. Duka recommends half of a home's units set each way, so that the ventilation is balanced. |
-| Heat recovery | Alternates, 70 seconds in and 70 seconds out, through its ceramic heat exchanger, which keeps the heat of the air going out. |
-| Supply | Only brings outdoor air in. |
-
-Duka's user manual describes them; Duka's app calls heat recovery "Regeneration".
+| Ventilation (one-way) | Moves air one way all the time: in or out, as a switch inside the unit (DIP switch) sets it. Duka recommends that half of a home's units blow in and half blow out, so that the air is balanced. |
+| Heat recovery | Changes direction every 70 seconds. The ceramic core keeps the heat of the air going out and gives it to the air coming in. Duka's app calls this "Regeneration". |
+| Supply | Only brings fresh air in. |
 
 ## Installation
 
-1. In HACS, add `https://github.com/HairingX/ha_duka_connect` as a custom repository of the
-   type *Integration*, and install **Duka Connect**.
+1. In HACS, open the three dots > **Custom repositories**, add
+   `https://github.com/HairingX/ha_duka_connect` with the type **Integration**, and download
+   **Duka Connect**.
 2. Restart Home Assistant.
-3. Settings > Devices & services > Add integration > **Duka Connect**.
+3. Go to **Settings > Devices & services > Add integration** and pick **Duka Connect**.
+4. Choose how to find the unit:
+   - **Search the network** finds the units on the same network as Home Assistant. Pick yours,
+     give it a name, and enter its password. If none is found, search again or enter it by hand.
+   - **Enter the unit by hand** if the search finds nothing, for example when the unit is on
+     another network (VLAN) than Home Assistant.
 
-Choose how to find the unit:
+What you are asked for:
 
-- **Search the network**: the integration asks every unit on the network, by broadcast. Pick the
-  unit from those found, name it, and give its password. When none is found, search again or
-  enter the unit by hand.
-- **Enter the unit by hand**: its IP address, best a fixed one set in your router, and its
-  password. The device id is in Duka's app; leave it empty, and the integration asks the unit
-  for it.
-
-| Setting | What it is |
+| Field | What to enter |
 |---|---|
-| Name | What the unit and its entities are called. It cannot be changed later: every entity's unique id starts with it. |
-| Host | The unit's IP address. |
-| Device id | The 16 characters in Duka's app, or on the board under the front cover. |
-| Password | `1111` unless it was changed in Duka's app. |
+| Name | What the unit is called in Home Assistant, such as *Bathroom*. Choose with care: it cannot be changed later. |
+| Host | The unit's IP address, from your router. Give the unit a fixed IP address in the router, so that it does not change. |
+| Device id | Leave it empty, and the integration finds it. Otherwise: the 16 characters shown in Duka's app, or printed on the board under the unit's front cover. |
+| Password | `1111`, unless you changed it in Duka's app. |
 
-The address and password can be changed later: the integration's three dots > Reconfigure.
+The address and password can be changed later: **Settings > Devices & services > Duka Connect >
+three dots > Reconfigure**.
 
 ## Options
 
-The integration's three dots > Configure:
+**Settings > Devices & services > Duka Connect > Configure**:
 
 | Option | What it is |
 |---|---|
-| Clock battery low under (mV) | The voltage under which *Clock battery low* is on; 2500 mV unless changed. A new CR1220 gives about 3000 mV, and no document says when Duka's app calls it flat: set it just over what *Clock battery* shows when the app asks for a new cell. |
+| Clock battery low under (mV) | *Clock battery* shows *Low* when the battery's voltage falls under this. 2500 mV unless you change it. A new battery gives about 3000 mV. Tip: when Duka's app says the battery is flat, look at *Clock battery voltage* and set the limit just above that value. |
 
-## How the data is updated
+## How often values are updated
 
-The integration polls the unit locally. Each value is read at its own rate, and only values an
-entity follows: the fan, its speed and the mode every 10 seconds, most values every 30 or 60
-seconds, the filter timer, clock battery and operating time every 15 minutes, the firmware once.
-A change made from Home Assistant is read back at once.
+Home Assistant asks the unit for its values on your network; the unit does not send them by
+itself. The fan, its speed and the ventilation mode every 10 seconds; most other values every 30
+or 60 seconds; the filter, clock battery and operating time every 15 minutes. A change made in
+Home Assistant shows at once. A change made with the unit's buttons, its remote or Duka's app
+shows within those times.
 
 ## Known limitations
 
-- **Untested on a unit**, as said above.
-- **The search reaches only the network Home Assistant is on.** A router does not forward a
-  broadcast between subnets or VLANs, whatever its firewall allows. Across them, enter the unit
-  by hand, and allow UDP port 4000 from Home Assistant to the unit. In Docker, Home Assistant
-  needs host networking.
-- **No discovery by Home Assistant itself.** The unit announces nothing of its own: no mDNS, and
-  its DHCP host name (`esp-…`) and MAC prefix are its Wi-Fi module's.
-- **A wrong password looks like a unit that is away**: the unit does not answer it.
-- **The weekly schedule's periods** cannot be set from Home Assistant; switch the schedule on
-  and off, and set its periods in Duka's app.
-- The unit's clock has no time zone; *Set clock* writes Home Assistant's local time.
+- **Not yet tested on a real unit**: some values may be missing or wrong.
+- **The search only finds units on the same network as Home Assistant.** If your units are on
+  another network (VLAN or subnet), enter them by hand. Your router must then let Home Assistant
+  reach the unit on UDP port 4000. If Home Assistant runs in Docker, it needs host networking.
+- **Home Assistant does not find the units by itself**: add them as described above.
+- **A wrong password looks like a unit that is turned off**: the unit does not answer it at all.
+- **The weekly schedule's times are set in Duka's app**; Home Assistant can only turn the
+  schedule on and off.
 
 ## Troubleshooting
 
-| What you see | What to do |
+| Problem | What to do |
 |---|---|
-| "The unit did not answer" | Check the address and password. Across subnets, allow UDP port 4000 from Home Assistant to the unit. |
-| The search finds nothing | Home Assistant and the unit are on different networks; enter the unit by hand. |
-| Entities unavailable | The unit stopped answering; the log says when it stopped and when it answers again. Give the unit a fixed IP address. |
-| A value looks wrong | Download the diagnostics (the integration's three dots > Download diagnostics) and open an issue with it. It holds every value with its raw bytes, and no password, address or device id. |
+| "The unit did not answer" | Check the IP address and the password. If the unit is on another network than Home Assistant, let Home Assistant reach it on UDP port 4000 in your router. |
+| The search finds nothing | The unit is probably on another network than Home Assistant. Enter it by hand. |
+| The entities are *Unavailable* | The unit has stopped answering, for example after getting a new IP address. Check it in your router and give it a fixed address; change it with Reconfigure. |
+| A value looks wrong or is missing | Download the diagnostics file (**Duka Connect > three dots > Download diagnostics**) and attach it to an issue on GitHub. It contains no password, IP address or device id. |
 
-For more detail, enable debug logging: the integration's three dots > Enable debug logging.
+For more detail in the log: **Duka Connect > three dots > Enable debug logging**.
 
 ## Removing the integration
 
-1. Settings > Devices & services > Duka Connect > three dots > **Delete**.
+1. **Settings > Devices & services > Duka Connect > three dots > Delete**.
 2. In HACS, remove **Duka Connect**, and restart Home Assistant.
 
-The unit is left as it is.
+The unit keeps running as before, and Duka's app still works.
 
 ## License
 
