@@ -244,3 +244,13 @@ def test_the_quality_scale_states_every_rule_and_explains_every_exemption() -> N
         assert entry["status"] in ("done", "exempt", "todo"), rule
         if entry["status"] != "done":
             assert entry.get("comment"), f"{rule} is {entry['status']} without a reason"
+
+
+def test_every_fan_preset_and_speed_has_its_own_icon() -> None:
+    icons = json.loads((INTEGRATION / "icons.json").read_text(encoding="utf-8"))["entity"]
+    names = _translations("en")["entity"]
+    presets = icons["fan"]["fan"]["state_attributes"]["preset_mode"]["state"]
+    assert set(presets) == set(names["fan"]["fan"]["state_attributes"]["preset_mode"]["state"])
+    speeds = icons["select"]["speed"]["state"]
+    assert set(speeds) == set(names["select"]["speed"]["state"])
+    assert len(set(speeds.values())) == len(speeds)
