@@ -77,14 +77,30 @@ async def test_an_alarm_level_is_shown_by_its_name(
     assert state(hass, "sensor", "alarm") == "warning"
 
 
-async def test_entities_are_unavailable_while_the_unit_does_not_answer(
+async def test_entities_are_unavailable_once_the_unit_has_been_silent_for_half_a_minute(
+    hass: HomeAssistant, loaded: DukaData, unit: SimulatedDuka, clock: FakeClock
+) -> None:
+    unit.answering = False
+    for _ in range(4):
+        clock.advance(10)
+        await loaded.client.poll()
+    await hass.async_block_till_done()
+    assert state(hass, "sensor", "humidity") == STATE_UNAVAILABLE
+
+
+async def test_a_single_lost_answer_leaves_the_entities_available(
     hass: HomeAssistant, loaded: DukaData, unit: SimulatedDuka, clock: FakeClock
 ) -> None:
     unit.answering = False
     clock.advance(30)
     await loaded.client.poll()
     await hass.async_block_till_done()
-    assert state(hass, "sensor", "humidity") == STATE_UNAVAILABLE
+    assert state(hass, "sensor", "humidity") == "45"
+    unit.answering = True
+    clock.advance(1)
+    await loaded.client.poll()
+    await hass.async_block_till_done()
+    assert state(hass, "sensor", "humidity") == "45"
 
 
 async def test_a_percentage_runs_the_fan_at_the_manual_speed(

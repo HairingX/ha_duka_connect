@@ -8,7 +8,6 @@ from typing import Any
 import pytest
 from duka_connect.testing import SimulatedDuka
 from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.setup import async_setup_component
@@ -46,7 +45,7 @@ async def test_a_write_the_unit_does_not_answer_is_an_error(
     assert raised.value.translation_key == "no_answer"
 
 
-async def test_an_update_the_unit_does_not_answer_makes_the_entity_unavailable(
+async def test_an_update_the_unit_does_not_answer_keeps_the_last_value(
     hass: HomeAssistant, loaded: DukaData, unit: SimulatedDuka
 ) -> None:
     assert await async_setup_component(hass, "homeassistant", {})
@@ -56,7 +55,7 @@ async def test_an_update_the_unit_does_not_answer_makes_the_entity_unavailable(
         {"entity_id": entity_id(hass, "sensor", "humidity")}, blocking=True,
     )
     current = hass.states.get(entity_id(hass, "sensor", "humidity"))
-    assert current is not None and current.state == STATE_UNAVAILABLE
+    assert current is not None and current.state == "45"
 
 
 async def test_an_update_reads_the_unit_now(

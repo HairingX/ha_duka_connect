@@ -17,8 +17,9 @@ new subscription or a write's read-back can make a value due while it sleeps.
 - The task is made with `ConfigEntry.async_create_background_task`. Unloading cancels the task
   and awaits it before the client disconnects, so no read runs against a closing connection.
 - A poll that raises is logged and the loop goes on. A unit that does not answer is told by the
-  client's status: the entities become unavailable, and the integration logs once when the
-  unit stops answering and once when it answers again.
+  client's status, which turns only after half a minute of silence: a lost answer is asked again
+  within seconds while the entities show the last values. Then the entities become unavailable,
+  and the integration logs once when the unit stops answering and once when it answers again.
 - With polling disabled in the entry's system options, no task is started: only what is asked
   for is read, by `homeassistant.update_entity` and after a write. Changing it reloads the entry.
 
@@ -44,7 +45,7 @@ entity follows its points and the client's status, and sets its `_attr_` values 
 | `GOOD` | shows it |
 | `NO_DATA` | is unknown |
 | `STALE` | shows the last good value |
-| `OFFLINE`, `MISSING`, or the unit does not answer | is unavailable |
+| `OFFLINE`, `MISSING`, or the unit has not answered for half a minute | is unavailable |
 
 The unit's clock has no time zone. *Set clock* writes Home Assistant's local time to it, and the
 *Clock* sensor reads it back in the same time zone; *Clock offset* compares it with the time it
