@@ -35,12 +35,6 @@
       "boost_off_delay": {
         "default": "mdi:timer-outline"
       },
-      "night_timer": {
-        "default": "mdi:weather-night"
-      },
-      "party_timer": {
-        "default": "mdi:party-popper"
-      },
       "filter_interval": {
         "default": "mdi:air-filter"
       },
@@ -67,6 +61,12 @@
       },
       "manual_speed": {
         "default": "mdi:fan"
+      },
+      "reduced_duration": {
+        "default": "mdi:fan-minus"
+      },
+      "boost_duration": {
+        "default": "mdi:fan-plus"
       }
     },
     "select": {
@@ -74,7 +74,12 @@
         "default": "mdi:swap-horizontal"
       },
       "timer_mode": {
-        "default": "mdi:timer-cog-outline"
+        "default": "mdi:timer-cog-outline",
+        "state": {
+          "off": "mdi:timer-off-outline",
+          "reduced": "mdi:fan-minus",
+          "boost": "mdi:fan-plus"
+        }
       },
       "speed": {
         "default": "mdi:fan-speed-2",

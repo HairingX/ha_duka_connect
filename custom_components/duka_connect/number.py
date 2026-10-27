@@ -80,8 +80,8 @@ NUMBERS: tuple[DukaNumberDescription, ...] = (
         mode=NumberMode.BOX,
         entity_category=EntityCategory.CONFIG,
     ),
-    _duration(PointKey.NIGHT_TIMER, UnitOfTime.MINUTES),
-    _duration(PointKey.PARTY_TIMER, UnitOfTime.MINUTES),
+    _duration(PointKey.REDUCED_DURATION, UnitOfTime.MINUTES),
+    _duration(PointKey.BOOST_DURATION, UnitOfTime.MINUTES),
     _duration(PointKey.FILTER_INTERVAL, UnitOfTime.DAYS),
     DukaNumberDescription(
         key=str(PointKey.ANALOG_SENSOR_THRESHOLD),

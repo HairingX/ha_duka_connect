@@ -27,7 +27,7 @@ page if you need them. An entity your unit does not have is not created.
 | Speed | Low, medium, high or manual. Its history shows which speed the unit ran at. |
 | Manual speed | The speed used when *Speed* is manual, in %. It is the same percentage the fan shows. |
 | Ventilation mode | How the air moves: see [Ventilation modes](#ventilation-modes). |
-| Timed speed | Low or high speed for a while, then back to how it ran: see [Timed speed](#timed-speed). |
+| Timer | Reduced speed or boost for a while, then back to how it ran: see [Timer](#timer). |
 
 ### Sensors
 
@@ -40,7 +40,7 @@ page if you need them. An entity your unit does not have is not created.
 | Boost | *Running* while the unit runs extra strong, for example because of high humidity. |
 | High humidity | *Wet* while the humidity is over *Humidity threshold*, *Dry* otherwise. |
 | Fan 1 RPM, Fan 2 RPM | How fast each fan turns. |
-| Time left of timed speed | How long the timed speed has left. *Hidden.* |
+| Time left on timer | How long the timer has left. *Hidden.* |
 | Relay sensor, 0-10 V sensor level, 0-10 V sensor over threshold | An external sensor wired to the unit, if there is one. *Hidden.* |
 
 ### Configuration
@@ -50,7 +50,7 @@ page if you need them. An entity your unit does not have is not created.
 | Humidity boost | Lets high humidity make the unit run extra strong. |
 | Humidity threshold | The humidity that does so, from 40 to 80 %. |
 | Boost off delay | How many minutes it keeps running strong after the humidity has fallen. |
-| Low speed period, High speed period | How long each timed speed lasts. |
+| Reduced speed duration, Boost duration | How long each timer lasts. |
 | Weekly schedule | Lets the unit follow the weekly schedule set in Duka's app. |
 | Cloud access | Lets Duka's app reach the unit through Duka's cloud: from away, or from a phone on another network (VLAN). Turn it off to keep the app out; turn it on when you want to use the app. It shows what the unit reports; Home Assistant changes it only when you do. |
 | Reset filter timer | Press after changing the filter. |
@@ -82,21 +82,20 @@ With Home Assistant set to Danish, the names are shown in Danish.
 | Heat recovery | Changes direction every 70 seconds. The ceramic core keeps the heat of the air going out and gives it to the air coming in. Duka's app calls this "Regeneration". |
 | Supply | Only brings fresh air in. |
 
-### Timed speed
+### Timer
 
 | Choice | What the unit does |
 |---|---|
 | Off | Runs at the speed you chose. |
-| Low for a while | Runs at its lowest speed, quietly, for example while you sleep: 8 hours, unless *Low speed period* says otherwise. |
-| High for a while | Runs at its highest speed, to air out after cooking or when many people have been in a room: 4 hours, unless *High speed period* says otherwise. |
+| Reduced speed | Runs at its lowest speed, quietly, for example while you sleep: 8 hours, unless *Reduced speed duration* says otherwise. |
+| Boost | Runs at its highest speed, to air out after cooking or when many people have been in a room: 4 hours, unless *Boost duration* says otherwise. |
 
 When the time is up, the unit goes back to how it ran before. A press of any of its buttons ends
-it at once. *Time left of timed speed* shows how long is left. Duka's app and manual call these
-night mode and party mode.
+it at once. *Time left on timer* shows how long is left.
 
-Boost is not a mode you choose: the unit runs at its highest speed by itself while the humidity is
-over *Humidity threshold*, or an external sensor asks for it, and for *Boost off delay* minutes
-after. *Boost* shows when it does.
+The unit also boosts by itself, without the timer: while the humidity is over *Humidity
+threshold*, or an external sensor asks for it, and for *Boost off delay* minutes after. *Boost*
+shows when it does.
 
 ## Installation
 

@@ -12,7 +12,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryError, ConfigEntryNotReady
 from homeassistant.helpers import entity_registry as er
 
-from .const import BATTERY_LOW_DEFAULT, CONF_BATTERY_LOW, CONF_DEVICE_ID, DOMAIN, POLL_TICK
+from .const import BATTERY_LOW_DEFAULT, CONF_BATTERY_LOW, CONF_DEVICE_ID, DOMAIN, POLL_TICK, RENAMED_KEYS
 from .data import DukaConfigEntry, DukaData, new_client
 
 _LOGGER = logging.getLogger(__name__)
@@ -49,6 +49,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: DukaConfigEntry) -> bool
             translation_placeholders={"name": name},
         ) from err
 
+    await er.async_migrate_entries(hass, entry.entry_id, _renamed(name))
     try:
         entry.runtime_data = DukaData(
             client=client,
@@ -100,6 +101,18 @@ def _log_when_unavailable(client: Client, name: str) -> Callable[[], None]:
             answered = True
 
     return client.subscribe_status(Status.CONNECTED, status_changed)
+
+
+def _renamed(name: str) -> Callable[[er.RegistryEntry], dict[str, str] | None]:
+    """A migration that gives the entities of renamed points their new unique id."""
+    renamed = {f"{name}_{old}": f"{name}_{new}" for old, new in RENAMED_KEYS.items()}
+
+    @callback
+    def migrate(entity: er.RegistryEntry) -> dict[str, str] | None:
+        new = renamed.get(entity.unique_id)
+        return None if new is None else {"new_unique_id": new}
+
+    return migrate
 
 
 @callback

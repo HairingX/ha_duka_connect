@@ -41,3 +41,7 @@ CLOCK_KEY: Final = "clock"
 
 CLOCK_OFFSET_KEY: Final = "clock_offset"
 """The key of the sensor showing how far the unit's clock is from Home Assistant's."""
+
+RENAMED_KEYS: Final = {"night_timer": "reduced_duration", "party_timer": "boost_duration"}
+"""Points whose key the library has renamed: the key an entity's unique id was made of, and the
+key it is made of now."""

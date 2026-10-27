@@ -50,7 +50,7 @@ async def test_the_unit_has_every_entity(hass: HomeAssistant, loaded: DukaData) 
             "fan2_rpm", "analog_sensor_level", "ip_address",
             "humidity_over_threshold", "relay_sensor_active", "analog_sensor_over_threshold",
             "weekly_schedule", "cloud_enabled", "relay_sensor_enabled", "analog_sensor_enabled",
-            "night_timer", "party_timer", "filter_interval", "analog_sensor_threshold",
+            "reduced_duration", "boost_duration", "filter_interval", "analog_sensor_threshold",
             "supply_speed_1", "exhaust_speed_1", "supply_speed_2", "exhaust_speed_2",
             "supply_speed_3", "exhaust_speed_3", "restore_fan_speeds", "set_clock",
             "speed", "manual_speed", "clock", "clock_offset",
@@ -307,7 +307,7 @@ async def test_a_timer_duration_is_written_in_minutes(
 ) -> None:
     await hass.services.async_call(
         "number", "set_value",
-        {"entity_id": entity_id(hass, "number", "night_timer"), "value": 90},
+        {"entity_id": entity_id(hass, "number", "reduced_duration"), "value": 90},
         blocking=True,
     )
     assert unit.values[0x0302] == bytes([30, 1])
