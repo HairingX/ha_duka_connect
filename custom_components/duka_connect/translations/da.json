@@ -125,10 +125,10 @@
         "name": "Boost-efterløb"
       },
       "night_timer": {
-        "name": "Varighed af nattilstand"
+        "name": "Periode med lav hastighed"
       },
       "party_timer": {
-        "name": "Varighed af festtilstand"
+        "name": "Periode med høj hastighed"
       },
       "filter_interval": {
         "name": "Interval for filterskift"
@@ -168,11 +168,11 @@
         }
       },
       "timer_mode": {
-        "name": "Timertilstand",
+        "name": "Tidsbegrænset hastighed",
         "state": {
           "off": "Fra",
-          "night": "Nat",
-          "party": "Fest"
+          "night": "Lav i en periode",
+          "party": "Høj i en periode"
         }
       },
       "speed": {
@@ -199,7 +199,7 @@
         "name": "Tid til filterskift"
       },
       "timer_countdown": {
-        "name": "Tid tilbage på timer"
+        "name": "Tid tilbage af periode"
       },
       "operating_time": {
         "name": "Driftstid"
