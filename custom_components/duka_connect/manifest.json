@@ -9,6 +9,6 @@
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/HairingX/ha_duka_connect/issues",
   "loggers": ["duka_connect"],
-  "requirements": ["duka_connect==0.3.0"],
+  "requirements": ["duka_connect==0.4.0"],
   "version": "0.0.0"
 }

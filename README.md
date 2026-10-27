@@ -128,6 +128,10 @@ the speed changes, and again until they have settled. When the unit's warning or
 the clock battery and the filter are read 10 seconds later, and again every 10 seconds while
 they change, for up to 2 minutes. What a button changes is read a second after it is pressed.
 
+When the unit misses an answer - a Wi-Fi hiccup - it is asked again a second later, then after 2,
+4 and 8 seconds, while the entities keep showing the last values. Only when it has not answered
+for half a minute do they become *Unavailable*.
+
 ## Known limitations
 
 - **Not yet tested on a real unit**: some values may be missing or wrong.
@@ -145,7 +149,7 @@ they change, for up to 2 minutes. What a button changes is read a second after i
 |---|---|
 | "The unit did not answer" | Check the IP address and the password. If the unit is on another network than Home Assistant, let Home Assistant reach it on UDP port 4000 in your router. |
 | The search finds nothing | The unit is probably on another network than Home Assistant. Enter it by hand. |
-| The entities are *Unavailable* | The unit has stopped answering, for example after getting a new IP address. Check it in your router and give it a fixed address; change it with Reconfigure. |
+| The entities are *Unavailable* | The unit has not answered for half a minute, for example after getting a new IP address. Check it in your router and give it a fixed address; change it with Reconfigure. |
 | A value looks wrong or is missing | Download the diagnostics file (**Duka Connect > three dots > Download diagnostics**) and attach it to an issue on GitHub. It contains no password, IP address or device id. |
 
 For more detail in the log: **Duka Connect > three dots > Enable debug logging**.

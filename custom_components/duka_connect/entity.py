@@ -151,9 +151,9 @@ class DukaEntity(Entity):
         _LOGGER.debug("Writing %s", writes)
         if await self._client.write_sequence([Write(key, value) for key, value in writes]):
             return
-        answered = self._client.status(Status.CONNECTED).value
         raise HomeAssistantError(
-            translation_domain=DOMAIN, translation_key="write_refused" if answered else "no_answer"
+            translation_domain=DOMAIN,
+            translation_key="no_answer" if self._client.silent else "write_refused",
         )
 
 
