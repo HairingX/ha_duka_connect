@@ -125,10 +125,10 @@
         "name": "Boost off delay"
       },
       "night_timer": {
-        "name": "Night mode duration"
+        "name": "Low speed period"
       },
       "party_timer": {
-        "name": "Party mode duration"
+        "name": "High speed period"
       },
       "filter_interval": {
         "name": "Filter change interval"
@@ -168,11 +168,11 @@
         }
       },
       "timer_mode": {
-        "name": "Timer mode",
+        "name": "Timed speed",
         "state": {
           "off": "Off",
-          "night": "Night",
-          "party": "Party"
+          "night": "Low for a while",
+          "party": "High for a while"
         }
       },
       "speed": {
@@ -199,7 +199,7 @@
         "name": "Filter time left"
       },
       "timer_countdown": {
-        "name": "Time left on timer"
+        "name": "Time left of timed speed"
       },
       "operating_time": {
         "name": "Operating time"
