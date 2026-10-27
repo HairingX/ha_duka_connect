@@ -124,12 +124,6 @@
       "boost_off_delay": {
         "name": "Boost-efterløb"
       },
-      "night_timer": {
-        "name": "Periode med lav hastighed"
-      },
-      "party_timer": {
-        "name": "Periode med høj hastighed"
-      },
       "filter_interval": {
         "name": "Interval for filterskift"
       },
@@ -156,6 +150,12 @@
       },
       "manual_speed": {
         "name": "Manuel hastighed"
+      },
+      "reduced_duration": {
+        "name": "Varighed af reduceret hastighed"
+      },
+      "boost_duration": {
+        "name": "Varighed af boost"
       }
     },
     "select": {
@@ -168,11 +168,11 @@
         }
       },
       "timer_mode": {
-        "name": "Tidsbegrænset hastighed",
+        "name": "Timer",
         "state": {
           "off": "Fra",
-          "night": "Lav i en periode",
-          "party": "Høj i en periode"
+          "reduced": "Reduceret hastighed",
+          "boost": "Boost"
         }
       },
       "speed": {
@@ -199,7 +199,7 @@
         "name": "Tid til filterskift"
       },
       "timer_countdown": {
-        "name": "Tid tilbage af periode"
+        "name": "Tid tilbage på timer"
       },
       "operating_time": {
         "name": "Driftstid"

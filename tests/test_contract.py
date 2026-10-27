@@ -256,7 +256,7 @@ def test_every_fan_preset_and_speed_has_its_own_icon() -> None:
     assert len(set(speeds.values())) == len(speeds)
 
 
-@pytest.mark.parametrize("language,low,high", [("en", "Low", "High"), ("da", "Lav", "Høj")])
-def test_the_timed_speeds_are_named_by_the_speed_they_run_at(language: str, low: str, high: str) -> None:
+@pytest.mark.parametrize("language,reduced,boost", [("en", "Reduced speed", "Boost"), ("da", "Reduceret hastighed", "Boost")])
+def test_the_timer_modes_are_named_by_what_they_do(language: str, reduced: str, boost: str) -> None:
     states = _translations(language)["entity"]["select"]["timer_mode"]["state"]
-    assert states["night"].startswith(low) and states["party"].startswith(high)
+    assert (states["reduced"], states["boost"]) == (reduced, boost)

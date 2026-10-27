@@ -124,12 +124,6 @@
       "boost_off_delay": {
         "name": "Boost off delay"
       },
-      "night_timer": {
-        "name": "Low speed period"
-      },
-      "party_timer": {
-        "name": "High speed period"
-      },
       "filter_interval": {
         "name": "Filter change interval"
       },
@@ -156,6 +150,12 @@
       },
       "manual_speed": {
         "name": "Manual speed"
+      },
+      "reduced_duration": {
+        "name": "Reduced speed duration"
+      },
+      "boost_duration": {
+        "name": "Boost duration"
       }
     },
     "select": {
@@ -168,11 +168,11 @@
         }
       },
       "timer_mode": {
-        "name": "Timed speed",
+        "name": "Timer",
         "state": {
           "off": "Off",
-          "night": "Low for a while",
-          "party": "High for a while"
+          "reduced": "Reduced speed",
+          "boost": "Boost"
         }
       },
       "speed": {
@@ -199,7 +199,7 @@
         "name": "Filter time left"
       },
       "timer_countdown": {
-        "name": "Time left of timed speed"
+        "name": "Time left on timer"
       },
       "operating_time": {
         "name": "Operating time"

@@ -70,6 +70,23 @@ async def test_the_entities_of_a_point_the_unit_lost_are_removed(
     await hass.async_block_till_done()
 
 
+@pytest.mark.parametrize("old,new", [("night_timer", "reduced_duration"), ("party_timer", "boost_duration")])
+async def test_an_entity_of_a_renamed_point_keeps_its_entity_id_and_history(
+    hass: HomeAssistant, config_entry: MockConfigEntry, old: str, new: str
+) -> None:
+    config_entry.add_to_hass(hass)
+    registry = er.async_get(hass)
+    kept = registry.async_get_or_create(
+        "number", DOMAIN, f"Duka One_{old}", config_entry=config_entry, suggested_object_id=f"duka_one_{old}"
+    )
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+    assert registry.async_get_entity_id("number", DOMAIN, f"Duka One_{new}") == kept.entity_id
+    assert registry.async_get_entity_id("number", DOMAIN, f"Duka One_{old}") is None
+    await hass.config_entries.async_unload(config_entry.entry_id)
+    await hass.async_block_till_done()
+
+
 async def test_a_unit_that_stops_answering_is_logged_once_and_again_when_it_answers(
     hass: HomeAssistant,
     loaded: DukaData,
