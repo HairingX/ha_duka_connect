@@ -27,7 +27,7 @@ page if you need them. An entity your unit does not have is not created.
 | Speed | Low, medium, high or manual. Its history shows which speed the unit ran at. |
 | Manual speed | The speed used when *Speed* is manual, in %. It is the same percentage the fan shows. |
 | Ventilation mode | How the air moves: see [Ventilation modes](#ventilation-modes). |
-| Timer mode | Off, night (quiet) or party (strong) for a while. |
+| Timer mode | Night or party for a while, then back to how it ran: see [Timer modes](#timer-modes). |
 
 ### Sensors
 
@@ -81,6 +81,22 @@ With Home Assistant set to Danish, the names are shown in Danish.
 | Ventilation (one-way) | Moves air one way all the time: in or out, as a switch inside the unit (DIP switch) sets it. Duka recommends that half of a home's units blow in and half blow out, so that the air is balanced. |
 | Heat recovery | Changes direction every 70 seconds. The ceramic core keeps the heat of the air going out and gives it to the air coming in. Duka's app calls this "Regeneration". |
 | Supply | Only brings fresh air in. |
+
+### Timer modes
+
+| Mode | What the unit does |
+|---|---|
+| Off | Runs at the speed you chose. |
+| Night | Runs at its lowest speed, quietly, while you sleep: 8 hours, unless *Night mode duration* says otherwise. |
+| Party | Runs at its highest speed, to air out after cooking or when many people have been in a room: 4 hours, unless *Party mode duration* says otherwise. |
+
+When the time is up, the unit goes back to how it ran before. A press of any of its buttons ends
+the mode at once. *Time left on timer* shows how long is left. Duka's app and manual use the same
+names.
+
+Boost is not a mode you choose: the unit runs at its highest speed by itself while the humidity is
+over *Humidity threshold*, or an external sensor asks for it, and for *Boost off delay* minutes
+after. *Boost* shows when it does.
 
 ## Installation
 
