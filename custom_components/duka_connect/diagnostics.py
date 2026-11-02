@@ -1,4 +1,4 @@
-"""What a bug report needs: every value with its quality and raw bytes."""
+"""What a bug report needs: how the unit answers, and every value with its quality and raw bytes."""
 
 from __future__ import annotations
 
@@ -45,5 +45,6 @@ async def async_get_config_entry_diagnostics(
         },
         "unit_type": client.unit_type,
         "connected": client.status(Status.CONNECTED).value,
+        "link": dict(client.diagnostics()),
         "values": values,
     }
