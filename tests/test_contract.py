@@ -260,3 +260,10 @@ def test_every_fan_preset_and_speed_has_its_own_icon() -> None:
 def test_the_timer_modes_are_named_by_what_they_do(language: str, reduced: str, boost: str) -> None:
     states = _translations(language)["entity"]["select"]["timer_mode"]["state"]
     assert (states["reduced"], states["boost"]) == (reduced, boost)
+
+
+def test_the_manifest_names_the_logger_of_every_library_that_logs_about_the_unit() -> None:
+    """An outage is logged by event_connect, which duka_connect requires."""
+    requires = importlib.metadata.requires("duka_connect") or []
+    libraries = {"duka_connect"} | {"event_connect" for line in requires if line.startswith("event_connect")}
+    assert libraries <= set(_manifest()["loggers"])
