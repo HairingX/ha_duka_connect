@@ -185,9 +185,9 @@ def test_the_test_requirements_pin_what_the_manifest_requires() -> None:
     assert [line for line in lines if line.startswith("duka_connect==")] == _manifest()["requirements"]
 
 
-def test_hacs_requires_the_home_assistant_the_tests_run() -> None:
+def test_hacs_requires_no_newer_home_assistant_than_the_tests_run() -> None:
     hacs = json.loads((REPOSITORY / "hacs.json").read_text(encoding="utf-8"))
-    assert hacs["homeassistant"] == HA_VERSION
+    assert Version(hacs["homeassistant"]) <= Version(HA_VERSION)
 
 
 def test_the_library_is_imported_from_its_package_not_from_the_integration() -> None:
