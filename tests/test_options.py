@@ -8,7 +8,7 @@ from duka_connect.testing import SimulatedDuka
 from homeassistant.const import STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
-from pytest_homeassistant_custom_component.common import MockConfigEntry
+from pytest_homeassistant.common import MockConfigEntry
 
 from custom_components.duka_connect.const import BATTERY_LOW_DEFAULT, CONF_BATTERY_LOW
 from custom_components.duka_connect.data import DukaData
