@@ -2,7 +2,15 @@
 
 from __future__ import annotations
 
-from duka_connect import Point, PointKey, Speed, VentilationMode, WriteRange
+from duka_connect import (
+    DataValue,
+    Point,
+    PointKey,
+    Quality,
+    Speed,
+    VentilationMode,
+    WriteRange,
+)
 from duka_connect.testing import SimulatedDuka
 from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import HomeAssistant
@@ -19,6 +27,7 @@ from pytest_homeassistant.common import MockConfigEntry
 
 from custom_components.duka_connect.const import DOMAIN
 from custom_components.duka_connect.data import DukaData
+from custom_components.duka_connect.entity import usable
 from custom_components.duka_connect.number import NUMBERS, DukaNumber, DukaNumberDescription
 
 from .conftest import FakeClock
@@ -87,6 +96,19 @@ async def test_entities_are_unavailable_once_the_unit_has_been_silent_for_half_a
         await loaded.client.poll()
     await hass.async_block_till_done()
     assert state(hass, "sensor", "humidity") == STATE_UNAVAILABLE
+
+
+def test_a_value_is_shown_when_the_library_says_its_quality_has_something_to_show(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def only_missing(self: Quality) -> bool:
+        return self is Quality.MISSING
+
+    monkeypatch.setattr(Quality, "shows_a_value", property(only_missing))
+    now = dt_util.utcnow()
+    assert usable(DataValue(None, Quality.MISSING, now))
+    assert not usable(DataValue(45, Quality.GOOD, now))
+    assert not usable(None)
 
 
 async def test_a_single_lost_answer_leaves_the_entities_available(
