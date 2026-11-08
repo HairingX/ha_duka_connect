@@ -32,4 +32,4 @@ async def test_diagnostics_say_how_the_unit_answers(
     report = await async_get_config_entry_diagnostics(hass, config_entry)
     link = report["link"]
     assert link["requests"] > 0
-    assert (link["paused"], link["paused_for"], link["pauses"], link["gave_up"]) == (False, 0.0, 0, False)
+    assert (link["open"], link["open_for"], link["openings"], link["gave_up"]) == (False, 0.0, 0, False)
