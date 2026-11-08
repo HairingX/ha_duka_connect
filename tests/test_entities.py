@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from duka_connect import Speed, VentilationMode
+from duka_connect import Point, PointKey, Speed, VentilationMode, WriteRange
 from duka_connect.testing import SimulatedDuka
 from homeassistant.const import STATE_OFF, STATE_ON, STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import HomeAssistant
@@ -19,6 +19,7 @@ from pytest_homeassistant.common import MockConfigEntry
 
 from custom_components.duka_connect.const import DOMAIN
 from custom_components.duka_connect.data import DukaData
+from custom_components.duka_connect.number import NUMBERS, DukaNumber, DukaNumberDescription
 
 from .conftest import FakeClock
 
@@ -174,6 +175,42 @@ async def test_a_number_outside_its_limits_is_refused(
             {"entity_id": entity_id(hass, "number", "humidity_threshold"), "value": 30},
             blocking=True,
         )
+
+
+@pytest.mark.parametrize("description", NUMBERS, ids=lambda d: str(d.point))
+async def test_a_number_offers_the_values_its_point_can_be_written_with(
+    hass: HomeAssistant, loaded: DukaData, description: DukaNumberDescription
+) -> None:
+    number = DukaNumber(loaded, description)
+    span = (
+        WriteRange(0.0, 100.0, 1.0)
+        if description.percentage
+        else loaded.client.points[description.point].write_range()
+    )
+    assert span is not None
+    offered = (number.native_min_value, number.native_max_value, number.native_step)
+    assert offered == (span.min, span.max, span.step)
+
+
+async def test_a_number_of_a_point_written_with_any_value_in_its_range_has_no_step_of_its_own(
+    hass: HomeAssistant, loaded: DukaData, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def any_value(self: Point[int]) -> WriteRange:
+        return WriteRange(40.0, 80.0, None)
+
+    point = loaded.client.points[PointKey.HUMIDITY_THRESHOLD]
+    monkeypatch.setattr(type(point), "write_range", any_value)
+    description = next(d for d in NUMBERS if d.point == PointKey.HUMIDITY_THRESHOLD)
+    number = DukaNumber(loaded, description)
+    assert not hasattr(number, "_attr_native_step")
+
+
+async def test_a_number_of_a_point_without_a_range_to_write_is_refused(
+    hass: HomeAssistant, loaded: DukaData
+) -> None:
+    description = DukaNumberDescription(key="humidity", point=PointKey.HUMIDITY)
+    with pytest.raises(ValueError, match="humidity"):
+        DukaNumber(loaded, description)
 
 
 async def test_turning_the_fan_on_writes_power_on(

@@ -145,8 +145,8 @@ class DukaEntity(Entity):
         """Write the values in one request, raising an error the user can read when one is not
         taken.
 
-        Every entity offers only values within its point's limits, so none is refused before it
-        is sent.
+        Every entity offers only values its point can be written with, so none is refused before
+        it is sent.
         """
         _LOGGER.debug("Writing %s", writes)
         if await self._client.write_sequence([Write(key, value) for key, value in writes]):
