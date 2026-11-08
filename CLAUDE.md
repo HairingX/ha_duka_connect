@@ -16,8 +16,8 @@ How and why it is built as it is: `docs/design.md`.
 - An existing installation keeps its entities: a unique id is the unit's name and the point's
   key, and a test holds every entity a Duka One has. Removing or moving one is agreed with the
   user first.
-- The library developed alongside it is `duka_connect`, listed in `pyproject.toml` for test
-  builds and CI.
+- The libraries developed alongside it are `event_connect` and `duka_connect`, in that order,
+  listed in `pyproject.toml` for test builds and CI.
 
 <!-- BEGIN HairingX/workflows: shared; edit it there -->
 ## Shared by every integration

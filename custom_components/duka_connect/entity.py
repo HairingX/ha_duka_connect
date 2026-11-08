@@ -24,12 +24,6 @@ from .data import DukaData, value
 
 _LOGGER = logging.getLogger(__name__)
 
-_USABLE = frozenset({Quality.GOOD, Quality.NO_DATA, Quality.STALE})
-"""Qualities an entity shows: a value, "unknown" for no reading, or the last good value.
-
-OFFLINE and MISSING leave the entity unavailable, as does a unit that stopped answering.
-"""
-
 
 @dataclass(frozen=True, kw_only=True)
 class DukaEntityDescription(EntityDescription):
@@ -67,8 +61,9 @@ def device_info(data: DukaData) -> DeviceInfo:
 
 
 def usable(current: DataValue[Any] | None) -> bool:
-    """Whether a value may be shown: a reading, no reading, or the last good one."""
-    return current is not None and current.quality in _USABLE
+    """Whether a value was read and its quality has something to show: a reading, that there is
+    none, or the last good one."""
+    return current is not None and current.quality.shows_a_value
 
 
 class DukaEntity(Entity):
@@ -145,8 +140,8 @@ class DukaEntity(Entity):
         """Write the values in one request, raising an error the user can read when one is not
         taken.
 
-        Every entity offers only values within its point's limits, so none is refused before it
-        is sent.
+        Every entity offers only values its point can be written with, so none is refused before
+        it is sent.
         """
         _LOGGER.debug("Writing %s", writes)
         if await self._client.write_sequence([Write(key, value) for key, value in writes]):

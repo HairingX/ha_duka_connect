@@ -20,8 +20,9 @@ new subscription or a write's read-back can make a value due while it sleeps.
   client's status, which turns only after half a minute of silence: a lost answer is asked again
   within seconds while the entities show the last values. Then the entities become unavailable,
   and the integration logs once when the unit stops answering and once when it answers again.
-- With polling disabled in the entry's system options, no task is started: only what is asked
-  for is read, by `homeassistant.update_entity` and after a write. Changing it reloads the entry.
+- With polling disabled in the entry's system options, the client reads nothing on its schedule:
+  only what is asked for, by `homeassistant.update_entity`, and what a write asks to be read back.
+  The task still runs, as that read-back is made by its poll. Changing it reloads the entry.
 
 ## How often
 

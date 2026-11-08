@@ -143,9 +143,10 @@ the speed changes, and again until they have settled. When the unit's warning or
 the clock battery and the filter are read 10 seconds later, and again every 10 seconds while
 they change, for up to 2 minutes. What a button changes is read a second after it is pressed.
 
-When the unit misses an answer - a Wi-Fi hiccup - it is asked again a second later, then after 2,
-4 and 8 seconds, while the entities keep showing the last values. Only when it has not answered
-for half a minute do they become *Unavailable*.
+When the unit misses an answer - a Wi-Fi hiccup - the request is sent again, up to three times,
+two seconds apart, while the entities keep showing the last values. After two requests in a row
+go unanswered, the unit is asked again every 10 seconds until it answers. Only when it has not
+answered for half a minute do the entities become *Unavailable*.
 
 ## Known limitations
 

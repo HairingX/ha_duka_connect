@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from duka_connect import Key, PointKey
+from duka_connect import Key, PointKey, WriteRange
 from homeassistant.components.number import (
     NumberDeviceClass,
     NumberEntity,
@@ -21,10 +21,13 @@ from .speed import manual_to_percentage, percentage_to_manual
 
 PARALLEL_UPDATES = 0
 
+_PERCENTAGE = WriteRange(0.0, 100.0, 1.0)
+"""What a manual speed is offered as: the percentage the fan shows."""
+
 
 @dataclass(frozen=True, kw_only=True)
 class DukaNumberDescription(DukaEntityDescription, NumberEntityDescription):
-    """A number of one setting; its limits are the point's, or 0 to 100 % for a manual speed."""
+    """A number of one setting; its range is the point's, or 0 to 100 % for a manual speed."""
 
     point: Key[int]
     percentage: bool = False
@@ -114,17 +117,25 @@ async def async_setup_entry(
 
 
 class DukaNumber(DukaPointEntity, NumberEntity):
-    """A setting that is a whole number within the point's limits."""
+    """A setting that is a number within the range the point can be written with."""
 
     def __init__(self, data: DukaData, description: DukaNumberDescription) -> None:
+        """Offer the values the point can be written with, or 0 to 100 % for a manual speed.
+
+        Raises:
+            ValueError: the point cannot be written within a range.
+        """
         self._setting = description.point
         self._percentage = description.percentage
-        limits = data.client.points[description.point].limits
-        minimum = limits.min if limits is not None and limits.min is not None else 0
-        maximum = limits.max if limits is not None and limits.max is not None else 255
-        self._attr_native_min_value = 0.0 if self._percentage else float(minimum)
-        self._attr_native_max_value = 100.0 if self._percentage else float(maximum)
-        self._attr_native_step = 1
+        span = (
+            _PERCENTAGE if self._percentage else data.client.points[description.point].write_range()
+        )
+        if span is None:
+            raise ValueError(f"{description.point} has no range to be written within")
+        self._attr_native_min_value = span.min
+        self._attr_native_max_value = span.max
+        if span.step is not None:
+            self._attr_native_step = span.step
         super().__init__(data, description)
 
     def _show(self) -> None:

@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import asyncio
+
 import pytest
 from duka_connect.testing import SimulatedDuka
 from homeassistant.config_entries import ConfigEntryState
+from homeassistant.const import STATE_OFF, STATE_ON
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from pytest_homeassistant.common import MockConfigEntry
@@ -105,7 +108,7 @@ async def test_a_unit_that_stops_answering_is_logged_once_and_again_when_it_answ
     assert messages == ["Duka One does not answer", "Duka One answers again"]
 
 
-async def test_polling_disabled_in_the_system_options_starts_no_polling(
+async def test_with_polling_disabled_nothing_is_read_on_a_schedule(
     hass: HomeAssistant, unit: SimulatedDuka
 ) -> None:
     entry = MockConfigEntry(
@@ -113,6 +116,33 @@ async def test_polling_disabled_in_the_system_options_starts_no_polling(
     )
     await set_up(hass, entry)
     data: DukaData = entry.runtime_data
-    assert data.poller is None
+    assert data.client.seconds_until_next_poll() is None
+    assert await hass.config_entries.async_unload(entry.entry_id)
+    await hass.async_block_till_done()
+
+
+async def test_with_polling_disabled_what_a_command_changes_is_still_read_back(
+    hass: HomeAssistant, unit: SimulatedDuka, clock: FakeClock, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr("custom_components.duka_connect.POLL_TICK", 0.01)
+    entry = MockConfigEntry(
+        domain=DOMAIN, unique_id=DEVICE_ID, data=entry_data(), pref_disable_polling=True
+    )
+    unit.values[0x88] = b"\x01"
+    await set_up(hass, entry)
+    registry = er.async_get(hass)
+    filter_replace = registry.async_get_entity_id("binary_sensor", DOMAIN, "Duka One_filter_replace")
+    reset = registry.async_get_entity_id("button", DOMAIN, "Duka One_reset_filter_timer")
+    current = hass.states.get(filter_replace or "")
+    assert filter_replace is not None and current is not None and current.state == STATE_ON
+    await hass.services.async_call("button", "press", {"entity_id": reset}, blocking=True)
+    clock.advance(1)
+    for _ in range(100):
+        current = hass.states.get(filter_replace)
+        if current is not None and current.state == STATE_OFF:
+            break
+        await asyncio.sleep(0.01)
+    current = hass.states.get(filter_replace)
+    assert current is not None and current.state == STATE_OFF
     assert await hass.config_entries.async_unload(entry.entry_id)
     await hass.async_block_till_done()
