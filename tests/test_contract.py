@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import importlib.metadata
 import json
+import tomllib
 from collections.abc import Iterator, Mapping
 from pathlib import Path
 from typing import Any, cast
@@ -183,6 +184,14 @@ def test_the_manifest_pins_the_library_version_the_tests_run() -> None:
 def test_the_test_requirements_pin_what_the_manifest_requires() -> None:
     lines = (REPOSITORY / "requirements-test.txt").read_text(encoding="utf-8").splitlines()
     assert [line for line in lines if line.startswith("duka_connect==")] == _manifest()["requirements"]
+
+
+def test_the_libraries_developed_alongside_are_listed_in_the_order_they_are_installed() -> None:
+    """duka_connect requires event_connect, so a development branch is tested with both."""
+    settings = tomllib.loads((REPOSITORY / "pyproject.toml").read_text(encoding="utf-8"))
+    requires = importlib.metadata.requires("duka_connect") or []
+    assert any(line.startswith("event_connect") for line in requires)
+    assert settings["tool"]["ha-integration-workflows"]["libraries"] == ["event_connect", "duka_connect"]
 
 
 def test_hacs_requires_no_newer_home_assistant_than_the_tests_run() -> None:
