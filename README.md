@@ -66,7 +66,7 @@ page if you need them. An entity your unit does not have is not created.
 |---|---|
 | Clock battery | *Low* when the unit's clock battery, a CR1220 coin cell, needs changing. |
 | Clock battery voltage | That battery's voltage. |
-| Clock | The date and time the unit's clock shows, as of its last reading (every 15 minutes). |
+| Clock | The date and time the unit's clock shows, as of its last reading; it is read rarely. |
 | Clock offset | How many seconds the unit's clock is ahead (+) or behind (−) Home Assistant's. Press *Set clock* to make it 0. |
 | Operating time | How long the unit has run in all. |
 | Firmware version | The unit's software version, also shown on the device page. |
@@ -133,20 +133,20 @@ three dots > Reconfigure**.
 ## How often values are updated
 
 Home Assistant asks the unit for its values on your network; the unit does not send them by
-itself. The fan, its speed and the ventilation mode every 10 seconds; most other values every 30
-or 60 seconds; the filter, clock battery and operating time every 15 minutes. A change made in
-Home Assistant shows at once. A change made with the unit's buttons, its remote or Duka's app
-shows within those times.
+itself. Each value is read on its own schedule: the fan, its speed and the ventilation mode most
+often; most other values less often; the filter, clock battery and operating time least often.
+Only what an enabled entity shows is read. A change made in Home Assistant shows at once. A
+change made with the unit's buttons, its remote or Duka's app shows at the value's next reading.
 
-What a change affects is read sooner than its own time. The fans' speeds are read 3 seconds after
+What a change affects is read sooner than its own time. The fans' speeds are read shortly after
 the speed changes, and again until they have settled. When the unit's warning or alarm clears,
-the clock battery and the filter are read 10 seconds later, and again every 10 seconds while
-they change, for up to 2 minutes. What a button changes is read a second after it is pressed.
+the clock battery and the filter are read again while they change. What a button changes is read
+shortly after it is pressed.
 
-When the unit misses an answer - a Wi-Fi hiccup - the request is sent again, up to three times,
-two seconds apart, while the entities keep showing the last values. After two requests in a row
-go unanswered, the unit is asked again every 10 seconds until it answers. Only when it has not
-answered for half a minute do the entities become *Unavailable*.
+When the unit misses an answer - a Wi-Fi hiccup - the request is sent again, while the entities
+keep showing the last values. When requests go unanswered in a row, the unit is asked less often
+until it answers. Only when it has missed several readings in a row do the entities become
+*Unavailable*.
 
 ## Known limitations
 
@@ -165,7 +165,7 @@ answered for half a minute do the entities become *Unavailable*.
 |---|---|
 | "The unit did not answer" | Check the IP address and the password. If the unit is on another network than Home Assistant, let Home Assistant reach it on UDP port 4000 in your router. |
 | The search finds nothing | The unit is probably on another network than Home Assistant. Enter it by hand. |
-| The entities are *Unavailable* | The unit has not answered for half a minute, for example after getting a new IP address. Check it in your router and give it a fixed address; change it with Reconfigure. |
+| The entities are *Unavailable* | The unit has stopped answering, for example after getting a new IP address. Check it in your router and give it a fixed address; change it with Reconfigure. |
 | A value looks wrong or is missing | Download the diagnostics file (**Duka Connect > three dots > Download diagnostics**) and attach it to an issue on GitHub. It contains no password, IP address or device id. |
 
 For more detail in the log: **Duka Connect > three dots > Enable debug logging**.
