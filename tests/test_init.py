@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 
 import pytest
+from duka_connect import Status
 from duka_connect.testing import SimulatedDuka
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import STATE_OFF, STATE_ON
@@ -53,7 +54,7 @@ async def test_unloading_stops_polling_and_disconnects(
     assert poller is not None and not poller.done()
     assert await hass.config_entries.async_unload(config_entry.entry_id)
     await hass.async_block_till_done()
-    assert poller.done()
+    assert poller.cancelled()
     assert config_entry.state is ConfigEntryState.NOT_LOADED
 
 
@@ -108,6 +109,19 @@ async def test_a_unit_that_stops_answering_is_logged_once_and_again_when_it_answ
     assert messages == ["Duka One does not answer", "Duka One answers again"]
 
 
+async def test_unloading_does_not_log_that_the_unit_stopped_answering(
+    hass: HomeAssistant, config_entry: MockConfigEntry, loaded: DukaData,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    assert await hass.config_entries.async_reload(config_entry.entry_id)
+    await hass.async_block_till_done()
+    assert await hass.config_entries.async_unload(config_entry.entry_id)
+    await hass.async_block_till_done()
+    assert not loaded.client.status(Status.CONNECTED).value
+    messages = [r.getMessage() for r in caplog.records if r.name == "custom_components.duka_connect"]
+    assert messages == []
+
+
 async def test_with_polling_disabled_nothing_is_read_on_a_schedule(
     hass: HomeAssistant, unit: SimulatedDuka
 ) -> None:
@@ -122,9 +136,8 @@ async def test_with_polling_disabled_nothing_is_read_on_a_schedule(
 
 
 async def test_with_polling_disabled_what_a_command_changes_is_still_read_back(
-    hass: HomeAssistant, unit: SimulatedDuka, clock: FakeClock, monkeypatch: pytest.MonkeyPatch
+    hass: HomeAssistant, unit: SimulatedDuka, clock: FakeClock
 ) -> None:
-    monkeypatch.setattr("custom_components.duka_connect.POLL_TICK", 0.01)
     entry = MockConfigEntry(
         domain=DOMAIN, unique_id=DEVICE_ID, data=entry_data(), pref_disable_polling=True
     )
@@ -137,7 +150,8 @@ async def test_with_polling_disabled_what_a_command_changes_is_still_read_back(
     assert filter_replace is not None and current is not None and current.state == STATE_ON
     await hass.services.async_call("button", "press", {"entity_id": reset}, blocking=True)
     clock.advance(1)
-    for _ in range(100):
+    # The client waits in real time for the second its fake clock has already moved on.
+    for _ in range(300):
         current = hass.states.get(filter_replace)
         if current is not None and current.state == STATE_OFF:
             break

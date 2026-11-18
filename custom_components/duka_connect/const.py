@@ -11,13 +11,6 @@ DEFAULT_NAME: Final = "Duka One"
 """What a unit is called unless the user names it: every unique id starts with the name, so the
 entities keep theirs when the unit is replaced."""
 
-POLL_TICK: Final = 1.0
-"""Longest wait, in seconds, between two calls to the client's poll.
-
-The client plans every read itself, and a poll with nothing due sends nothing. The wait is
-capped because a new subscription can make a point due while the loop sleeps.
-"""
-
 BATTERY_LOW_DEFAULT: Final = 2500
 """Millivolts under which the clock battery counts as low until the user sets another limit.
 

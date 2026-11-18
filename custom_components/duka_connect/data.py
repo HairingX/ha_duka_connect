@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Callable
 from dataclasses import dataclass, field
 
 from duka_connect import Client, Key, create_client
@@ -21,6 +22,8 @@ class DukaData:
     name: str
     """The unit's name, which every unique id and the device's identifier start with."""
     poller: asyncio.Task[None] | None = field(default=None, repr=False)
+    stop_logging: Callable[[], None] | None = field(default=None, repr=False)
+    """Stops logging when the unit stops or starts answering."""
     unique_ids: set[str] = field(default_factory=set[str])
     """The unique id of every entity built for the entry, disabled ones included."""
     battery_low: int = BATTERY_LOW_DEFAULT

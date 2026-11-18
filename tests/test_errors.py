@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 from typing import Any
 
 import pytest
@@ -95,21 +94,3 @@ async def test_an_entry_whose_platforms_do_not_unload_stays_loaded(
         patched.setattr(hass.config_entries, "async_unload_platforms", refusing)
         assert not await integration.async_unload_entry(hass, config_entry)
 
-
-async def test_a_poll_that_raises_is_logged_and_polling_goes_on(
-    loaded: DukaData, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
-) -> None:
-    polls = 0
-
-    async def raising() -> None:
-        nonlocal polls
-        polls += 1
-        raise RuntimeError("poll")
-
-    monkeypatch.setattr(integration, "POLL_TICK", 0.01)
-    monkeypatch.setattr(loaded.client, "poll", raising)
-    async with asyncio.timeout(5):
-        while polls < 2:
-            await asyncio.sleep(0.01)
-    assert loaded.poller is not None and not loaded.poller.done()
-    assert "Reading the unit failed" in caplog.text
