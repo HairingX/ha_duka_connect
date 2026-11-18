@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Callable
 from dataclasses import dataclass, field
 
-from duka_connect import Client, Key
+from duka_connect import Client, Key, create_client
 from homeassistant.config_entries import ConfigEntry
 
 from .const import BATTERY_LOW_DEFAULT
@@ -21,6 +22,8 @@ class DukaData:
     name: str
     """The unit's name, which every unique id and the device's identifier start with."""
     poller: asyncio.Task[None] | None = field(default=None, repr=False)
+    stop_logging: Callable[[], None] | None = field(default=None, repr=False)
+    """Stops logging when the unit stops or starts answering."""
     unique_ids: set[str] = field(default_factory=set[str])
     """The unique id of every entity built for the entry, disabled ones included."""
     battery_low: int = BATTERY_LOW_DEFAULT
@@ -29,7 +32,7 @@ class DukaData:
 
 def new_client(host: str, device_id: str, password: str) -> Client:
     """A client for the unit at `host`; not yet connected."""
-    return Client(host, device_id, password)
+    return create_client(host=host, device_id=device_id, password=password)
 
 
 def value[T](client: Client, key: Key[T]) -> T | None:

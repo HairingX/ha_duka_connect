@@ -22,6 +22,7 @@ typeCheckingMode = "strict"
 reportMissingTypeStubs = "none"
 
 [tool.ha-integration-workflows]
-# Developed alongside this integration, in the order they are installed: a development branch is
-# tested and test-built with their branch of the same name, where they have one.
-libraries = ["duka_connect"]
+# Developed alongside this integration, in the order they are installed - event_connect first, as
+# duka_connect needs it. A development branch is tested and test-built with their branch of the
+# same name, where they have one.
+libraries = ["event_connect", "duka_connect"]

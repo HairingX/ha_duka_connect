@@ -23,12 +23,14 @@ async def test_diagnostics_hold_every_value_and_no_credential(
         assert secret not in text
     assert report["entry"]["data"]["password"] == REDACTED
     assert report["values"]["rtc_battery_voltage"]["raw"] == "c20b"
-    assert report["unit_type"] == 3
+    assert (report["model"], report["identity"]) == ("Duka One", {"unit_type": 3})
+    assert report["values"]["rtc_battery_voltage"]["consecutive_failures"] == 0
 
 
 async def test_diagnostics_say_how_the_unit_answers(
     hass: HomeAssistant, config_entry: MockConfigEntry, loaded: DukaData
 ) -> None:
     report = await async_get_config_entry_diagnostics(hass, config_entry)
-    assert report["link"]["requests"] > 0
-    assert report["link"]["backing_off_for"] == 0.0
+    link = report["link"]
+    assert link["requests"] > 0
+    assert (link["open"], link["open_for"], link["openings"], link["gave_up"]) == (False, 0.0, 0, False)

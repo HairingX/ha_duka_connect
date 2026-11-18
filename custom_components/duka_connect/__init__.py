@@ -12,7 +12,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryError, ConfigEntryNotReady
 from homeassistant.helpers import entity_registry as er
 
-from .const import BATTERY_LOW_DEFAULT, CONF_BATTERY_LOW, CONF_DEVICE_ID, DOMAIN, POLL_TICK, RENAMED_KEYS
+from .const import BATTERY_LOW_DEFAULT, CONF_BATTERY_LOW, CONF_DEVICE_ID, DOMAIN, RENAMED_KEYS
 from .data import DukaConfigEntry, DukaData, new_client
 
 _LOGGER = logging.getLogger(__name__)
@@ -62,14 +62,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: DukaConfigEntry) -> bool
         await client.disconnect()
         raise
 
-    entry.async_on_unload(_log_when_unavailable(client, name))
+    entry.runtime_data.stop_logging = _log_when_unavailable(client, name)
     # With polling disabled in the entry's system options, only what is asked for is read:
     # homeassistant.update_entity, and the read-back of a write. Changing it reloads the entry.
-    if not entry.pref_disable_polling:
-        # Polling starts once the entities have subscribed: the client reads what is wanted.
-        entry.runtime_data.poller = entry.async_create_background_task(
-            hass, _poll(client), f"{DOMAIN} poll {entry.title}"
-        )
+    client.set_scheduled_polling(not entry.pref_disable_polling)
+    # Polling starts once the entities have subscribed: the client reads what is wanted.
+    entry.runtime_data.poller = entry.async_create_background_task(
+        hass, client.run(), f"{DOMAIN} poll {entry.title}"
+    )
     return True
 
 
@@ -79,9 +79,12 @@ async def async_unload_entry(hass: HomeAssistant, entry: DukaConfigEntry) -> boo
         return False
     data = entry.runtime_data
     if data.poller is not None:
-        # Stopped before the disconnect, so no read runs against a closing connection.
+        # Stopped before the disconnect, which would end it with an error.
         data.poller.cancel()
         await asyncio.wait([data.poller])
+    if data.stop_logging is not None:
+        # A disconnect makes the unit count as not answering, which is no news when unloading.
+        data.stop_logging()
     await data.client.disconnect()
     return True
 
@@ -124,15 +127,3 @@ def _remove_lost_entities(hass: HomeAssistant, entry: DukaConfigEntry) -> None:
         if found.unique_id not in built:
             registry.async_remove(found.entity_id)
 
-
-async def _poll(client: Client) -> None:
-    """Read whatever the client has due, for as long as the entry is loaded."""
-    while True:
-        try:
-            await client.poll()
-        except Exception:
-            _LOGGER.exception("Reading the unit failed")
-            delay = POLL_TICK
-        else:
-            delay = client.seconds_until_next_poll()
-        await asyncio.sleep(POLL_TICK if delay is None else min(delay, POLL_TICK))

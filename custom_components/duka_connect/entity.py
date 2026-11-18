@@ -24,12 +24,6 @@ from .data import DukaData, value
 
 _LOGGER = logging.getLogger(__name__)
 
-_USABLE = frozenset({Quality.GOOD, Quality.NO_DATA, Quality.STALE})
-"""Qualities an entity shows: a value, "unknown" for no reading, or the last good value.
-
-OFFLINE and MISSING leave the entity unavailable, as does a unit that stopped answering.
-"""
-
 
 @dataclass(frozen=True, kw_only=True)
 class DukaEntityDescription(EntityDescription):
@@ -39,9 +33,9 @@ class DukaEntityDescription(EntityDescription):
 
 
 def shown(data: DukaData, key: Key[Any]) -> bool:
-    """Whether the unit has `key`: it did not answer that it lacks it."""
+    """Whether the unit has `key`: its model has it, and the unit did not answer that it lacks it."""
     current = data.client.value(key)
-    return current is None or current.quality is not Quality.MISSING
+    return data.client.has(key) and (current is None or current.quality is not Quality.MISSING)
 
 
 def describe[D: DukaEntityDescription](data: DukaData, descriptions: tuple[D, ...]) -> list[D]:
@@ -52,23 +46,26 @@ def describe[D: DukaEntityDescription](data: DukaData, descriptions: tuple[D, ..
 def device_info(data: DukaData) -> DeviceInfo:
     """The unit, identified by its name so that a replaced unit keeps its device; with the
     firmware and unit type it reported when connecting, where it did."""
+    model = data.client.model
     info = DeviceInfo(
         identifiers={(DOMAIN, data.name)},
         name=data.name,
-        manufacturer="Duka",
-        model="Duka One",
+        manufacturer=model.manufacturer,
+        model=model.name,
     )
     firmware = value(data.client, PointKey.FIRMWARE_VERSION)
     if firmware is not None:
         info["sw_version"] = firmware
-    if data.client.unit_type is not None:
-        info["model_id"] = str(data.client.unit_type)
+    unit_type = data.client.identity["unit_type"]
+    if unit_type is not None:
+        info["model_id"] = str(unit_type)
     return info
 
 
 def usable(current: DataValue[Any] | None) -> bool:
-    """Whether a value may be shown: a reading, no reading, or the last good one."""
-    return current is not None and current.quality in _USABLE
+    """Whether a value was read and its quality has something to show: a reading, that there is
+    none, or the last good one."""
+    return current is not None and current.quality.shows_a_value
 
 
 class DukaEntity(Entity):
@@ -145,8 +142,8 @@ class DukaEntity(Entity):
         """Write the values in one request, raising an error the user can read when one is not
         taken.
 
-        Every entity offers only values within its point's limits, so none is refused before it
-        is sent.
+        Every entity offers only values its point can be written with, so none is refused before
+        it is sent.
         """
         _LOGGER.debug("Writing %s", writes)
         if await self._client.write_sequence([Write(key, value) for key, value in writes]):

@@ -10,18 +10,21 @@ interval, only values an entity follows are read, everything due is read in one 
 poll with nothing due sends nothing. A coordinator would read every value as often as the
 fastest one needs.
 
-So the integration owns no update interval. It runs one background task per config entry that
-calls the client's poll and sleeps until the client has something due, at most a second, as a
-new subscription or a write's read-back can make a value due while it sleeps.
+So the integration owns no update interval and no loop. It runs the client's `run()` as one
+background task per config entry, which polls whenever the client has something due; a new
+subscription or a write wakes it at once.
 
 - The task is made with `ConfigEntry.async_create_background_task`. Unloading cancels the task
-  and awaits it before the client disconnects, so no read runs against a closing connection.
-- A poll that raises is logged and the loop goes on. A unit that does not answer is told by the
-  client's status, which turns only after half a minute of silence: a lost answer is asked again
-  within seconds while the entities show the last values. Then the entities become unavailable,
-  and the integration logs once when the unit stops answering and once when it answers again.
-- With polling disabled in the entry's system options, no task is started: only what is asked
-  for is read, by `homeassistant.update_entity` and after a write. Changing it reloads the entry.
+  and awaits it before the client disconnects, as a disconnect would end it with an error.
+- A poll that raises is logged by the client, and polling goes on. A unit that does not answer is
+  told by the client's status, which turns only after several reads in a row have gone
+  unanswered: a lost answer is asked again within seconds while the entities show the last
+  values. Then the entities become unavailable, and the integration logs once when the unit stops
+  answering and once when it answers again. That logging stops before an unload disconnects the
+  client, as a disconnect turns the status too.
+- With polling disabled in the entry's system options, the client reads nothing on its schedule:
+  only what is asked for, by `homeassistant.update_entity`, and what a write asks to be read back.
+  The task still runs, as that read-back is made by it. Changing it reloads the entry.
 
 ## How often
 
