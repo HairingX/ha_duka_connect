@@ -23,7 +23,6 @@ from homeassistant.config_entries import (
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PASSWORD
 from homeassistant.core import callback
 
-from . import const
 from .const import BATTERY_LOW_DEFAULT, CONF_BATTERY_LOW, CONF_DEVICE_ID, DEFAULT_NAME, DOMAIN
 from .data import new_client
 
@@ -40,7 +39,7 @@ async def find_device_id(host: str) -> str:
     Raises:
         DeviceIdNotFoundError: no unit, or more than one, answered.
     """
-    found = await discover(host, timeout=const.DISCOVERY_TIMEOUT)
+    found = await discover(target=host)
     if len(found) != 1:
         raise DeviceIdNotFoundError(host)
     return found[0].device_id
@@ -48,7 +47,7 @@ async def find_device_id(host: str) -> str:
 
 async def search_units() -> list[DiscoveredDevice]:
     """Ask every unit on the local network, by broadcast, for its address and device id."""
-    return await discover(timeout=const.DISCOVERY_TIMEOUT)
+    return await discover()
 
 
 async def connect_once(host: str, device_id: str, password: str) -> None:

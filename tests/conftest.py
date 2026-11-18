@@ -10,14 +10,13 @@ from typing import Any
 
 import pytest
 import pytest_socket
-from duka_connect import Client, DiscoveredDevice, discover
-from duka_connect.testing import FakeClock, SimulatedDuka
+from duka_connect import PORT, Client, Clock, DiscoveredDevice
+from duka_connect.testing import FakeClock, SimulatedDuka, client_for
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PASSWORD
 from homeassistant.core import HomeAssistant
 from homeassistant.util import dt as dt_util
 from pytest_homeassistant.common import MockConfigEntry
 
-from custom_components.duka_connect import const
 from custom_components.duka_connect.const import CONF_DEVICE_ID, DOMAIN
 from custom_components.duka_connect.data import DukaData
 
@@ -81,30 +80,40 @@ def simulated_network(
 ) -> list[Client]:
     """The network the integration sees holds only the simulated units.
 
-    A broadcast reaches every unit, and discovery sent to an address the first; a client
-    reaches the unit with its device id. Returns the clients made, in order.
+    A broadcast finds every unit that answers, and discovery sent to an address the first; a
+    client reaches the unit with its device id, or the first. Returns the clients made, in order.
     """
     made: list[Client] = []
-    monkeypatch.setattr(const, "DISCOVERY_TIMEOUT", 0.3)
+    fake_clock = clock
 
-    async def discover_units(
-        target: str = "255.255.255.255", *, port: int = 0, timeout: float = 2.0
-    ) -> list[DiscoveredDevice]:
-        reached = network if target == "255.255.255.255" else network[:1]
-        found: list[DiscoveredDevice] = []
-        for simulated in reached:
-            found += await discover(HOST, port=simulated.port, timeout=timeout)
-        return found
+    async def discover_units(*, target: str | None = None, port: int = PORT) -> list[DiscoveredDevice]:
+        reached = network if target is None else network[:1]
+        return [
+            DiscoveredDevice(
+                simulated.host,
+                simulated.port,
+                simulated.device_id,
+                int.from_bytes(simulated.values[0xB9], "little"),
+            )
+            for simulated in reached
+            if simulated.answering
+        ]
 
-    def client(host: str, device_id: str, password: str) -> Client:
-        port = next((s.port for s in network if s.device_id == device_id), unit.port)
-        made.append(
-            Client(host, device_id, password, port=port, timeout=0.2, attempts=1, clock=clock)
-        )
+    def client(
+        *,
+        host: str,
+        device_id: str,
+        password: str,
+        port: int = PORT,
+        read_only: bool = False,
+        clock: Clock | None = None,
+    ) -> Client:
+        simulated = next((s for s in network if s.device_id == device_id), unit)
+        made.append(client_for(simulated, timeout=0.2, attempts=1, clock=fake_clock, password=password))
         return made[-1]
 
     monkeypatch.setattr("custom_components.duka_connect.config_flow.discover", discover_units)
-    monkeypatch.setattr("custom_components.duka_connect.data.Client", client)
+    monkeypatch.setattr("custom_components.duka_connect.data.create_client", client)
     return made
 
 

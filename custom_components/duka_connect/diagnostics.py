@@ -34,6 +34,7 @@ async def async_get_config_entry_diagnostics(
                 "quality": current.quality.name,
                 "raw": bytes(current.raw).hex() or None,
                 "certainty": point.certainty.name,
+                "consecutive_failures": client.consecutive_failures(point.key),
             }
     return {
         "entry": {
@@ -43,7 +44,8 @@ async def async_get_config_entry_diagnostics(
                 for key, setting in entry.data.items()
             },
         },
-        "unit_type": client.unit_type,
+        "model": client.model.name,
+        "identity": dict(client.identity),
         "connected": client.status(Status.CONNECTED).value,
         "link": dict(client.diagnostics()),
         "values": values,

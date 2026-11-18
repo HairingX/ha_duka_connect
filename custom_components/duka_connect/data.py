@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 from dataclasses import dataclass, field
 
-from duka_connect import Client, Key
+from duka_connect import Client, Key, create_client
 from homeassistant.config_entries import ConfigEntry
 
 from .const import BATTERY_LOW_DEFAULT
@@ -29,7 +29,7 @@ class DukaData:
 
 def new_client(host: str, device_id: str, password: str) -> Client:
     """A client for the unit at `host`; not yet connected."""
-    return Client(host, device_id, password)
+    return create_client(host=host, device_id=device_id, password=password)
 
 
 def value[T](client: Client, key: Key[T]) -> T | None:

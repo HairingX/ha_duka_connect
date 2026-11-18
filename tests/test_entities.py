@@ -419,8 +419,9 @@ async def test_the_device_carries_the_firmware_and_unit_type(
 ) -> None:
     device = dr.async_get(hass).async_get_device_by_identifier((DOMAIN, NAME), config_entry.entry_id)
     assert device is not None
-    assert (device.manufacturer, device.model, device.sw_version, device.model_id) == (
-        "Duka", "Duka One", "1.5", "3"
+    assert device.identifiers == {(DOMAIN, NAME)}
+    assert (device.name, device.manufacturer, device.model, device.sw_version, device.model_id) == (
+        NAME, "Duka", "Duka One", "1.5", "3"
     )
 
 

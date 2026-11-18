@@ -33,9 +33,9 @@ class DukaEntityDescription(EntityDescription):
 
 
 def shown(data: DukaData, key: Key[Any]) -> bool:
-    """Whether the unit has `key`: it did not answer that it lacks it."""
+    """Whether the unit has `key`: its model has it, and the unit did not answer that it lacks it."""
     current = data.client.value(key)
-    return current is None or current.quality is not Quality.MISSING
+    return data.client.has(key) and (current is None or current.quality is not Quality.MISSING)
 
 
 def describe[D: DukaEntityDescription](data: DukaData, descriptions: tuple[D, ...]) -> list[D]:
@@ -46,17 +46,19 @@ def describe[D: DukaEntityDescription](data: DukaData, descriptions: tuple[D, ..
 def device_info(data: DukaData) -> DeviceInfo:
     """The unit, identified by its name so that a replaced unit keeps its device; with the
     firmware and unit type it reported when connecting, where it did."""
+    model = data.client.model
     info = DeviceInfo(
         identifiers={(DOMAIN, data.name)},
         name=data.name,
-        manufacturer="Duka",
-        model="Duka One",
+        manufacturer=model.manufacturer,
+        model=model.name,
     )
     firmware = value(data.client, PointKey.FIRMWARE_VERSION)
     if firmware is not None:
         info["sw_version"] = firmware
-    if data.client.unit_type is not None:
-        info["model_id"] = str(data.client.unit_type)
+    unit_type = data.client.identity["unit_type"]
+    if unit_type is not None:
+        info["model_id"] = str(unit_type)
     return info
 
 

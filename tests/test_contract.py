@@ -66,7 +66,7 @@ def _described() -> list[str]:
 
 def test_every_library_point_is_one_entity_or_has_a_reason_not_to_be() -> None:
     described = _described()
-    library = {str(point.key) for point in DUKA_ONE}
+    library = {str(point.key) for point in DUKA_ONE.points}
     assert len(described) == len(set(described)), "a point with two entities"
     assert library - set(described) - set(NOT_AN_ENTITY) == set()
     assert set(described) | set(NOT_AN_ENTITY) <= library

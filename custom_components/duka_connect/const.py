@@ -11,9 +11,6 @@ DEFAULT_NAME: Final = "Duka One"
 """What a unit is called unless the user names it: every unique id starts with the name, so the
 entities keep theirs when the unit is replaced."""
 
-DISCOVERY_TIMEOUT: Final = 2.0
-"""Seconds to wait for units to answer a discovery."""
-
 POLL_TICK: Final = 1.0
 """Longest wait, in seconds, between two calls to the client's poll.
 
