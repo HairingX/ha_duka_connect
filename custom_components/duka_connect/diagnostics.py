@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from duka_connect import Status
+from duka_connect import PointKey, Status
 from homeassistant.const import CONF_HOST, CONF_PASSWORD
 from homeassistant.core import HomeAssistant
 
@@ -15,6 +15,9 @@ REDACTED = "**REDACTED**"
 
 REDACTED_SETTINGS = frozenset({CONF_PASSWORD, CONF_HOST, CONF_DEVICE_ID})
 """The credential, and what locates or identifies the unit."""
+
+REDACTED_POINTS = frozenset({PointKey.IP_ADDRESS})
+"""The points whose value locates the unit: only whether they were read is kept."""
 
 
 async def async_get_config_entry_diagnostics(
@@ -29,10 +32,13 @@ async def async_get_config_entry_diagnostics(
     for name, point in sorted(client.points.items()):
         current = client.value(point.key) if point.readable else None
         if current is not None:
+            hidden = point.key in REDACTED_POINTS and current.value is not None
             values[name] = {
-                "value": str(current.value) if current.value is not None else None,
+                "value": REDACTED if hidden else (
+                    str(current.value) if current.value is not None else None
+                ),
                 "quality": current.quality.name,
-                "raw": bytes(current.raw).hex() or None,
+                "raw": REDACTED if hidden else (bytes(current.raw).hex() or None),
                 "certainty": point.certainty.name,
                 "consecutive_failures": client.consecutive_failures(point.key),
             }
