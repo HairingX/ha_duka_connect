@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from duka_connect.testing import SimulatedDuka
 from homeassistant.core import HomeAssistant
 from pytest_homeassistant.common import MockConfigEntry
 
@@ -12,6 +13,8 @@ from custom_components.duka_connect.diagnostics import (
 )
 
 from .conftest import DEVICE_ID, HOST, PASSWORD
+
+UNIT_ADDRESS = bytes([192, 0, 2, 77])
 
 
 async def test_diagnostics_hold_every_value_and_no_credential(
@@ -34,3 +37,25 @@ async def test_diagnostics_say_how_the_unit_answers(
     link = report["link"]
     assert link["requests"] > 0
     assert (link["open"], link["open_for"], link["openings"], link["gave_up"]) == (False, 0.0, 0, False)
+
+
+async def test_diagnostics_leave_out_the_address_the_unit_reports(
+    hass: HomeAssistant, config_entry: MockConfigEntry, unit: SimulatedDuka
+) -> None:
+    unit.values[0xA3] = UNIT_ADDRESS
+    config_entry.add_to_hass(hass)
+    await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
+    report = await async_get_config_entry_diagnostics(hass, config_entry)
+    text = repr(report)
+    assert "192.0.2.77" not in text
+    assert UNIT_ADDRESS.hex() not in text
+    assert report["values"]["ip_address"] == {
+        "value": REDACTED,
+        "quality": "GOOD",
+        "raw": REDACTED,
+        "certainty": "REPORTED",
+        "consecutive_failures": 0,
+    }
+    await hass.config_entries.async_unload(config_entry.entry_id)
+    await hass.async_block_till_done()
