@@ -166,7 +166,7 @@ until it answers. Only when it has missed several readings in a row do the entit
 | "The unit did not answer" | Check the IP address and the password. If the unit is on another network than Home Assistant, let Home Assistant reach it on UDP port 4000 in your router. |
 | The search finds nothing | The unit is probably on another network than Home Assistant. Enter it by hand. |
 | The entities are *Unavailable* | The unit has stopped answering, for example after getting a new IP address. Check it in your router and give it a fixed address; change it with Reconfigure. |
-| A value looks wrong or is missing | Download the diagnostics file (**Duka Connect > three dots > Download diagnostics**) and attach it to an issue on GitHub. It contains no password, IP address or device id. |
+| A value looks wrong or is missing, or a change does not take | Download the diagnostics file (**Duka Connect > three dots > Download diagnostics**) and attach it to an issue on GitHub. It holds the versions, every value with the bytes the unit answered, when it answered and how certain the value is, and the latest five writes of each setting with the bytes sent, how each ended and what the unit answered. It contains no password, IP address or device id. |
 
 For more detail in the log: **Duka Connect > three dots > Enable debug logging**.
 
