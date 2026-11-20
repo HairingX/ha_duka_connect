@@ -54,7 +54,7 @@ async def test_diagnostics_leave_out_the_address_the_unit_reports(
         "value": REDACTED,
         "quality": "GOOD",
         "raw": REDACTED,
-        "certainty": "REPORTED",
+        "certainty": "VERIFIED",
         "consecutive_failures": 0,
     }
     await hass.config_entries.async_unload(config_entry.entry_id)
